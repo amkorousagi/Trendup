@@ -1,0 +1,51 @@
+#pip install beautifulsoup4
+#pip install requests
+
+import requests
+# 원하는 웹 페이지에 접근해서 데이터를 받아온다.
+from bs4 import BeautifulSoup
+# 웹 페이지의 코드를 html형태로 해석해주고, 원하는 요소를 찾도록 도와준다.
+
+url = "https://search.shopping.naver.com/best100v2/detail/kwd.nhn?catId=50000001&kwdType=KWD"
+# 크롤러가 아닌척을 해보자!
+custom_header = {
+    "user-agent":"Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36"
+}
+req = requests.get(url, headers=custom_header)
+# 접속이 잘되었는지 확인하는 과정
+if req.status_code != requests.codes.ok:
+    print("접속실패")
+    exit()
+
+# 데이터를 잘 받아왔으니까 원하는걸 찾아보자!
+# Todo : 네이버에서 크롤러 접근을 막았다. 우회하는 방법이 필요하다.
+html = BeautifulSoup(req.text, "html.parser")
+"""
+selector 선택자
+html 태그들도 구성이 되어있다.
+1. container태그
+<span>내용</span>
+2. empty태그
+<img src="https://www.naver.com/logo.png" width="100" height="100">
+1) 단일 선택자
+- 태그이름 : span
+- id : #name
+- class : .nickname
+<img src="그림주소" id="name" class="nickname title title_bold">
+2) 복합 선택자
+- 속성 복합 : img.nickname.title
+- 경로 복합
+p span img.nickname
+* 대한민국 서울시 삼성동
+* 대한민국 > 서울시 > 삼성동 <---- 중간 경로 생략 불가능
+"""
+items = html.select("span.txt") # 원하는 그룹 요소들을 찾을 때
+
+#items= html.select_one('li') # 특정 요소 하나 찾을 때
+
+for item in items:
+   print(item.text)
+
+# Todo : 검색어를 날짜별로 엑셀 파일에 저장하기
+# Todo : 검색어를 매일 나에게 메일로 보내기
+# Todo : 검색어의 검색 결과 페이지 보여주기, 링크 첨부하기
