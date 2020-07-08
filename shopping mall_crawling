@@ -1,0 +1,57 @@
+#pip install beautifulsoup4
+#pip install requests
+
+##############인기 키워드 리스트 목록 필요###################
+
+######1. 11번가 ######
+#남성의류 1001312
+#여성의류 1001311
+
+######2. 쿠팡 #######
+#남성의류 187069
+#여성의류 186764
+
+import requests
+# 원하는 웹 페이지에 접근해서 데이터를 받아온다.
+from bs4 import BeautifulSoup
+# 웹 페이지의 코드를 html형태로 해석해주고, 원하는 요소를 찾도록 도와준다.
+
+
+###11번가###
+url = "http://www.11st.co.kr/browsing/BestSeller.tmall?method=getBestSellerMain&cornerNo=2&dispCtgrNo="+gender
+# 크롤러가 아닌척을 해보자!
+custom_header = {
+    "user-agent":"Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36"
+}
+req = requests.get(url, headers=custom_header)
+# 접속이 잘되었는지 확인하는 과정
+if req.status_code != requests.codes.ok:
+    print("접속실패")
+    exit()
+
+html = BeautifulSoup(req.text, "html.parser")
+
+items = html.select("p") # 원하는 그룹 요소들을 찾을 때
+
+for item in items:
+   print(item.text)
+
+
+###쿠 팡###
+url = "https://www.coupang.com/np/categories/"+gender
+# 크롤러가 아닌척을 해보자!
+custom_header = {
+    "user-agent":"Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36"
+}
+req = requests.get(url, headers=custom_header)
+# 접속이 잘되었는지 확인하는 과정
+if req.status_code != requests.codes.ok:
+    print("접속실패")
+    exit()
+
+html = BeautifulSoup(req.text, "html.parser")
+
+items = html.select(".descriptions .name") # 원하는 그룹 요소들을 찾을 때
+ 
+for item in items:
+   print(item.text)
