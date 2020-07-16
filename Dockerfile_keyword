@@ -1,0 +1,16 @@
+FROM python:3.6.7
+WORKDIR /app
+COPY ./requirements.txt /app
+RUN pip install --no-cache-dir -r requirements.txt
+RUN python -m spacy download en
+RUN python -m nltk.downloader wordnet
+COPY . .
+EXPOSE 5645
+
+ENV BRANCH US
+ENV OPENIE_ZH_URL http://cm-0.tepper.cmu.edu:2645
+ENV CORENLP_POS_TAGGER_EN ec2.convmind.ai
+ENV CORENLP_POS_TAGGER_ZH lambda.tepper.cmu.edu
+
+
+CMD [ "gunicorn", "-b", "0.0.0.0:5645", "-w", "4", "wsgi:application"]
