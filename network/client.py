@@ -4,7 +4,7 @@ import sys
 
 
 HOST = '127.0.0.1'
-PORT = sys.argv[1]
+PORT = int(sys.argv[1])
 
 client_socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 
