@@ -1,9 +1,10 @@
 # -*-coding:utf-8-*-
 import socket
+import sys
 
 
 HOST = '127.0.0.1'
-PORT = 9999
+PORT = sys.argv[1]
 
 client_socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 
