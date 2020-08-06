@@ -1,5 +1,6 @@
 # -*-coding:utf-8-*-
 import socket
+import sys
 from _thread import *
 
 
@@ -34,7 +35,7 @@ def threaded(client_socket, addr):
 
 
 HOST = '127.0.0.1'
-PORT = 9999
+PORT = int(sys.argv[1])
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
