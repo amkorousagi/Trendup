@@ -1,6 +1,4 @@
-#pip install beautifulsoup4
-#pip install requests
-#pip install pymysql
+
 
 import requests
 import pymysql.cursors
