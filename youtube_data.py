@@ -7,6 +7,7 @@
 # export GOOGLE_APPLICATION_CREDENTIALS="/home/psc/TrendUp-090b119d90eb.json"
 
 
+import tcp
 from langdetect import detect
 import json
 import requests
@@ -174,7 +175,8 @@ def analyze_channel_map(videoId):
 
 
 if __name__ == '__main__':
-    get_youtube_data_by_q(u"여름옷")
+    staff_socket = tcp.staff_ready(5002)
+    tcp.staff_update(get_youtube_data_by_q, "여름옷", staff_socket)
     #analyze_channel_map("r51UJMj9M6Y")
     '''
     response = requests.get(
