@@ -103,10 +103,10 @@ def get_youtube_data_by_q(q):
         for item in res["items"]:
             get_view_count_by_id(item["id"]["videoId"])
             print("category: {}".format(q))
-            print(u"keyword_title: {}".format(get_keyword(item["snippet"]["title"])))
-            print(u"keyword_desc: {}".format(get_keyword(item["snippet"]["description"])))
-            print(u"viewCount: {}".format(get_view_count_by_id(item["id"]["videoId"])))
-            print(u"publish time: {}".format(item["snippet"]["publishTime"]))
+            print("keyword_title: {}" + str(get_keyword(item["snippet"]["title"])).decode('cp949').encode('utf-8'))
+            print("keyword_desc: {}".format(get_keyword(item["snippet"]["description"])))
+            print("viewCount: {}".format(get_view_count_by_id(item["id"]["videoId"])))
+            print("publish time: {}".format(item["snippet"]["publishTime"]))
 
         if i < MAX_PAGE :
             # 더이상 자료가 없을때
