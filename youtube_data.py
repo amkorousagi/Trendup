@@ -172,8 +172,8 @@ def analyze_channel_map(videoId):
 
 
 if __name__ == '__main__':
-    #get_youtube_data_by_q("여름옷")
-    analyze_channel_map("r51UJMj9M6Y")
+    get_youtube_data_by_q("여름옷")
+    #analyze_channel_map("r51UJMj9M6Y")
     '''
     response = requests.get(
         URL_COMMENT_THREAD + "?part=snippet" + "&key=" + API_KEY + "&maxResults=" + MAX_RESULT + "&videoId=" + "r51UJMj9M6Y" + "&order=relevance")
