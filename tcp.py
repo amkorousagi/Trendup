@@ -29,6 +29,7 @@ STATE = "none"
 
 
 def youtube_data(staff_socket):
+    global FLAG_YOUTUBE_DATA
     while True:
 
         while True:
@@ -64,6 +65,7 @@ def youtube_data(staff_socket):
 
 
 def web_crawling(staff_socket):
+    global FLAG_WEB_CRAWLING
     while True:
 
         while True:
