@@ -29,7 +29,7 @@ STATE = "none"
 
 
 def youtube_data(staff_socket):
-
+    global FLAG_YOUTUBE_DATA
     while True:
 
         while True:
@@ -60,13 +60,13 @@ def youtube_data(staff_socket):
                 print("1youtube" + data.decode())
         else:
             print("wrong state")
-        global FLAG_YOUTUBE_DATA
+
         FLAG_YOUTUBE_DATA = False
     print()
 
 
 def web_crawling(staff_socket):
-
+    global FLAG_WEB_CRAWLING
     while True:
 
         while True:
@@ -97,7 +97,7 @@ def web_crawling(staff_socket):
                 print("1web crawling" + data.decode())
         else:
             print("wrong state")
-        global FLAG_WEB_CRAWLING
+
         FLAG_WEB_CRAWLING = False
     print()
 
