@@ -182,10 +182,10 @@ def master_ready():
     master_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     master_socket.bind((MASTER_PRIVATE_IP, MASTER_PORT))
     master_socket.listen()
-
-    while len(sockets) < SOCKET_AMOUNT:
+    i = 0
+    while i < SOCKET_AMOUNT:
         staff_socket, addr = master_socket.accept()
-        sockets.append(staff_socket)
+        i = i + 1
         start_new_thread(threaded, (staff_socket, addr))
 
     print("all container connected.")
@@ -255,7 +255,9 @@ def master_update():
         time.sleep(0.5)
         if not (FLAG_WEB_CRAWLING or FLAG_YOUTUBE_DATA):
             break
-
+    print("update is half finished")
+    return
+    
     global FLAG_GRAPH_DRAWING
     global FLAG_MACHINE_LEARNING
     FLAG_GRAPH_DRAWING = True
