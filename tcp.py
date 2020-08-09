@@ -281,8 +281,7 @@ def staff_update(func, argv_list, staff_socket):
     data = staff_socket.recv(1024)
     if data.decode() == "update":
         staff_socket.send("start update".encode())
-        #res = func(argv_list)
-        res = 0
+        res = func(argv_list)
         if res == 0:
             staff_socket.send("success".encode())
         else:
