@@ -64,9 +64,9 @@ def get_keyword(text_content):
 
     # Loop through entitites returned from the API
     for entity in response.entities:
-        print(u"Representative name for the entity: {}".format(entity.name))
-        print(u"Entity type: {}".format(enums.Entity.Type(entity.type).name))
-        print(u"Salience score: {}".format(entity.salience))
+        print("Representative name for the entity: {}".format(entity.name))
+        print("Entity type: {}".format(enums.Entity.Type(entity.type).name))
+        print("Salience score: {}".format(entity.salience))
         if (
                 (enums.Entity.Type(entity.type).name == "PERSON" or
                 enums.Entity.Type(entity.type).name == "UNKNOWN" or
