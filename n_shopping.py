@@ -63,3 +63,5 @@ tcp.staff_update(n_shopping, [], staff_socket)
             
 conn.commit()
 conn.close()
+
+return 0
