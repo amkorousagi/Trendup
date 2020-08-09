@@ -13,10 +13,13 @@ import json
 import requests
 from google.cloud import language_v1
 from google.cloud.language_v1 import enums
+'''
+#python3 is default is utf8
 from importlib import reload
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
+'''
 
 URL_SEARCH = "https://www.googleapis.com/youtube/v3/search"
 URL_VIDEO = "https://www.googleapis.com/youtube/v3/videos"
