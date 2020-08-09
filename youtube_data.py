@@ -107,7 +107,7 @@ def get_youtube_data_by_q(q):
 
         for item in res["items"]:
             get_view_count_by_id(item["id"]["videoId"])
-            print("category: {}".format(q))
+            print("category:", q)
             print("keyword_title:")
             for i in get_keyword(item["snippet"]["title"]):
                 print(i)
