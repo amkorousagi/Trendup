@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import requests
 import pymysql.cursors
 
@@ -15,7 +17,7 @@ def swithch_gender(x):
         1:'여성'
     }.get(x,-1)
 
-def counter(input_list):
+def counter(keyword):
     word_count = {}
     for word in keyword:
         if word in word_count:
@@ -81,8 +83,8 @@ def c_shopping():
                 x=x+1
 
         keyword2=[]
-        #상위 30개만 추출
-        for j in range(0,30):
+        #상위 20개만 추출
+        for j in range(0,20):
             keyword2.append(word_count[j])
 
         k=1
@@ -92,6 +94,7 @@ def c_shopping():
             query1="insert into c_shopping (rank,keyword,date_,gender,score) values(%s,%s,cast(now() as char),%s,%s)"
             curs.execute(query1,values1)
             k=k+1
+
 
 conn.commit()
 conn.close()
