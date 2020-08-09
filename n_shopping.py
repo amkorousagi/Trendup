@@ -28,36 +28,34 @@ conn = pymysql.connect(
     )
 curs=conn.cursor()
 
-for i in gender:
+def n_shopping():
+    for i in gender:
 
-    url = "https://search.shopping.naver.com/best100v2/detail/kwd.nhn?catId="+switch_site(i)+"&kwdType=KWD"
+        url = "https://search.shopping.naver.com/best100v2/detail/kwd.nhn?catId=" + switch_site(i) + "&kwdType=KWD"
 
-    custom_header = {
-        "user-agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36"
-    }
-    req = requests.get(url, headers=custom_header)
+        custom_header = {
+            "user-agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36"
+        }
+        req = requests.get(url, headers=custom_header)
 
-    html = BeautifulSoup(req.text, "html.parser")
+        html = BeautifulSoup(req.text, "html.parser")
 
-    items = html.select("span.txt")
+        items = html.select("span.txt")
 
-    keyword = []
-    for item in items:
-        keyword.append(item.text.strip())
+        keyword = []
+        for item in items:
+            keyword.append(item.text.strip())
 
+        k = 1
 
-    k=1
+        for j in keyword:
+            gender_ = swithch_gender(i)
+            values1 = (str(k), j, str(swithch_gender(i)))
+            query1 = "insert into n_shopping (rank,keyword,date_,gender) values(%s,%s,cast(now() as char),%s)"
 
+            curs.execute(query1, values1)
 
-    for j in keyword:
-        gender_=swithch_gender(i)
-        values1=(str(k),j,str(swithch_gender(i)))
-        query1="insert into n_shopping (rank,keyword,date_,gender) values(%s,%s,cast(now() as char),%s)"
-
-        curs.execute(query1,values1)
-
-        k=k+1
-
+            k = k + 1
 
 conn.commit()
 conn.close()
