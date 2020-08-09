@@ -56,7 +56,7 @@ def n_shopping(lst):
             curs.execute(query1, values1)
 
             k = k + 1
-
+    return 0
             
 staff_socket = tcp.staff_ready(5003)
 tcp.staff_update(n_shopping, [], staff_socket)
@@ -64,4 +64,3 @@ tcp.staff_update(n_shopping, [], staff_socket)
 conn.commit()
 conn.close()
 
-return 0
