@@ -10,7 +10,7 @@ import time
 from _thread import *
 
 MASTER_PUBLIC_IP = "49.50.164.37"
-MASTER_PRIVATE_IP = "10.36.7.36" #this may not work , please find your private ip by "hostname -I" command
+MASTER_PRIVATE_IP = "172.17.0.4 " #this may not work , please find your private ip by "hostname -I" command
 STAFF_IP = "0.0.0.0"
 MASTER_PORT = 5001
 YOUTUBE_DATA_PORT = 5002
