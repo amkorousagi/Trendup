@@ -59,6 +59,7 @@ def youtube_data(staff_socket):
                 print("1youtube" + data.decode())
         else:
             print("wrong state")
+        FLAG_YOUTUBE_DATA = False
     print()
 
 
@@ -93,6 +94,7 @@ def web_crawling(staff_socket):
                 print("1web crawling" + data.decode())
         else:
             print("wrong state")
+        FLAG_WEB_CRAWLING = False
     print()
 
 
