@@ -13,6 +13,7 @@ import json
 import requests
 from google.cloud import language_v1
 from google.cloud.language_v1 import enums
+from importlib import reload
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
