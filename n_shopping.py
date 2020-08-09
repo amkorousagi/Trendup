@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import tcp
 import requests
 import pymysql.cursors
 
@@ -28,7 +28,7 @@ conn = pymysql.connect(
     )
 curs=conn.cursor()
 
-def n_shopping():
+def n_shopping(lst):
     for i in gender:
 
         url = "https://search.shopping.naver.com/best100v2/detail/kwd.nhn?catId=" + switch_site(i) + "&kwdType=KWD"
@@ -57,5 +57,9 @@ def n_shopping():
 
             k = k + 1
 
+            
+staff_socket = tcp.staff_ready(5003)
+tcp.staff_update(n_shopping, [], staff_socket)
+            
 conn.commit()
 conn.close()
