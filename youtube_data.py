@@ -172,7 +172,7 @@ def analyze_channel_map(videoId):
 
 
 if __name__ == '__main__':
-    get_youtube_data_by_q("여름옷")
+    get_youtube_data_by_q(u"여름옷")
     #analyze_channel_map("r51UJMj9M6Y")
     '''
     response = requests.get(
