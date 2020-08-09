@@ -19,7 +19,7 @@ GRAPH_DRAWING_PORT = 5004
 MACHINE_LEARNING_PORT = 5005
 MAX_PORT_NUM = 5005
 
-SOCKET_AMOUNT = 4
+SOCKET_AMOUNT = 2
 sockets = []
 FLAG_YOUTUBE_DATA = False
 FLAG_WEB_CRAWLING = False
@@ -185,6 +185,7 @@ def master_ready():
 
     while len(sockets) < SOCKET_AMOUNT:
         staff_socket, addr = master_socket.accept()
+        sockets.append(staff_socket)
         start_new_thread(threaded, (staff_socket, addr))
 
     print("all container connected.")
