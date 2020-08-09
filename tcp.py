@@ -228,11 +228,11 @@ def master_init():
     print("initialization is finished")
 
 
-def staff_init(func, staff_socket):
+def staff_init(func, argv_list, staff_socket):
     data = staff_socket.recv(1024)
     if data.decode() == "init":
         staff_socket.send("start init".encode())
-        res = func()
+        res = func(argv_list)
         if res == 0:
             staff_socket.send("success".encode())
         else:
@@ -268,11 +268,11 @@ def master_update():
     print("update is finished")
 
 
-def staff_update(func, staff_socket):
+def staff_update(func, argv_list, staff_socket):
     data = staff_socket.recv(1024)
     if data.decode() == "update":
         staff_socket.send("start update".encode())
-        res = func()
+        res = func(argv_list)
         if res == 0:
             staff_socket.send("success".encode())
         else:
