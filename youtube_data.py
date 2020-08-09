@@ -181,7 +181,7 @@ def analyze_channel_map(videoId):
 
 if __name__ == '__main__':
     staff_socket = tcp.staff_ready(5002)
-    tcp.staff_update(get_youtube_data_by_q, "여름옷", staff_socket)
+    tcp.staff_update(get_youtube_data_by_q, "summer passion", staff_socket)
     #analyze_channel_map("r51UJMj9M6Y")
     '''
     response = requests.get(
