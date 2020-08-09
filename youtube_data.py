@@ -89,7 +89,7 @@ def get_view_count_by_id(videoId):
 def get_youtube_data_by_q(q):
     i = 0
     is_next = False
-    next
+    next = ""
     while True:
         i += 1
         if is_next:
