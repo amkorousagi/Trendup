@@ -124,6 +124,7 @@ def get_youtube_data_by_q(q):
                 break
             continue
         break
+    return 0
 
 
 
