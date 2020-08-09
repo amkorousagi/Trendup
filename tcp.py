@@ -237,7 +237,7 @@ def staff_init(func, argv_list, staff_socket):
         if res == 0:
             staff_socket.send("success".encode())
         else:
-            staff_socket.send(("fail %d" % res).encode())
+            staff_socket.send(("fail %d" %res).encode())
     else:
         staff_socket.send("wrong command".encode())
     print()
@@ -279,7 +279,7 @@ def staff_update(func, argv_list, staff_socket):
         if res == 0:
             staff_socket.send("success".encode())
         else:
-            staff_socket.send(("fail %d" % res).encode())
+            staff_socket.send(("fail %d" %res).encode())
     else:
         staff_socket.send("wrong command".encode())
     print()
