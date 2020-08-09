@@ -43,9 +43,9 @@ def youtube_data(staff_socket):
                 if data.decode() == "success":
                     print("youtube success")
                 else:
-                    print("youtube" + data.decode())
+                    print("0youtube" + data.decode())
             else:
-                print("youtube" + data.decode())
+                print("1youtube" + data.decode())
         elif STATE == "update":
             staff_socket.send("update".encode())
             data = staff_socket.recv(1024)
@@ -54,9 +54,9 @@ def youtube_data(staff_socket):
                 if data.decode() == "success":
                     print("youtube success")
                 else:
-                    print("youtube" + data.decode())
+                    print("0youtube" + data.decode())
             else:
-                print("youtube" + data.decode())
+                print("1youtube" + data.decode())
         else:
             print("wrong state")
     print()
@@ -77,7 +77,7 @@ def web_crawling(staff_socket):
                 if data.decode() == "success":
                     print("web crawling success")
                 else:
-                    print("web crawling" + data.decode())
+                    print("0web crawling" + data.decode())
             else:
                 print("web crawling" + data.decode())
         elif STATE == "update":
@@ -88,9 +88,9 @@ def web_crawling(staff_socket):
                 if data.decode() == "success":
                     print("web crawling success")
                 else:
-                    print("web crawling" + data.decode())
+                    print("01web crawling" + data.decode())
             else:
-                print("web crawling" + data.decode())
+                print("1web crawling" + data.decode())
         else:
             print("wrong state")
     print()
@@ -275,7 +275,8 @@ def staff_update(func, argv_list, staff_socket):
     data = staff_socket.recv(1024)
     if data.decode() == "update":
         staff_socket.send("start update".encode())
-        res = func(argv_list)
+        #res = func(argv_list)
+        res = 0
         if res == 0:
             staff_socket.send("success".encode())
         else:
