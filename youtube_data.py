@@ -25,7 +25,9 @@ URL_SEARCH = "https://www.googleapis.com/youtube/v3/search"
 URL_VIDEO = "https://www.googleapis.com/youtube/v3/videos"
 URL_COMMENT_THREAD = "https://www.googleapis.com/youtube/v3/commentThreads"
 URL_ACTIVITY = "https://www.googleapis.com/youtube/v3/activities"
-#API_KEY = "AIzaSyABYt3bjXmFzFyzZxJJut7J93Bv_3BkhUE"
+API_KEY = ""
+with open("/home/psc/api_key.txt", "r") as file:
+    API_KEY = file.read()
 MAX_RESULT = "5"
 MAX_PAGE = 5
 MAX_CHANNEL = 100
@@ -35,6 +37,7 @@ MAX_CHANNEL = 100
 channel_dict = dict()
 channel_count = 0
 vector_2d_channel = [[0]*MAX_CHANNEL]*MAX_CHANNEL
+
 
 def get_keyword(text_content):
     lst =[]
@@ -57,7 +60,7 @@ def get_keyword(text_content):
     # https://cloud.google.com/natural-language/docs/languages
     language = detect(text_content)
     print(language)
-    if (language != "en" and language != "ko"):
+    if not (language == "en" or language == "ko"):
         return lst
 
     document = {"content": text_content, "type": type_, "language": language}
@@ -78,7 +81,7 @@ def get_keyword(text_content):
                 enums.Entity.Type(entity.type).name == "CONSUMER_GOOD" or
                 enums.Entity.Type(entity.type).name == "OTHER") and
                 entity.salience > 0.1):
-            lst.append(entity.name.decode('utf-8').encode('utf-8'))
+            lst.append(entity.name)
         #print(u"Representative name for the entity: {}".format(entity.name))
         #print(u"Entity type: {}".format(enums.Entity.Type(entity.type).name))
         #print(u"Salience score: {}".format(entity.salience))
@@ -88,8 +91,9 @@ def get_keyword(text_content):
 def get_view_count_by_id(videoId):
     response = requests.get(URL_VIDEO + "?part=statistics" + "&key=" + API_KEY + "&id=" + videoId)
     temp = json.loads(response.text)
-    #print(json.dumps(temp, indent=4, ensure_ascii=False))
+    # print(json.dumps(temp, indent=4, ensure_ascii=False))
     return temp["items"][0]["statistics"]["viewCount"]
+
 
 def get_youtube_data_by_q(q):
     i = 0
@@ -103,7 +107,6 @@ def get_youtube_data_by_q(q):
             response = requests.get(URL_SEARCH + "?q=" + q + "&part=snippet" + "&key=" + API_KEY + "&maxResults=" + MAX_RESULT + "&type=video&regionCode=KR&relevanceLanguage=ko")
 
         res = json.loads(response.text)
-
 
         for item in res["items"]:
             get_view_count_by_id(item["id"]["videoId"])
@@ -136,7 +139,7 @@ def analyze_channel_map(videoId):
     result_dict = dict()
     response = requests.get(URL_COMMENT_THREAD + "?part=snippet" + "&key=" + API_KEY + "&maxResults=" + MAX_RESULT + "&videoId=" + videoId + "&order=relevance")
     temp = json.loads(response.text)
-    #print(json.dumps(temp, indent=4, ensure_ascii=False))
+    # print(json.dumps(temp, indent=4, ensure_ascii=False))
 
     for item in temp["items"]:
         author_channelId = item["snippet"]["topLevelComment"]["snippet"]["authorChannelId"]["value"]
@@ -176,21 +179,9 @@ def analyze_channel_map(videoId):
                 break
 
 
-
-
-
 if __name__ == '__main__':
-    staff_socket = tcp.staff_ready(5002)
-    tcp.staff_update(get_youtube_data_by_q, "summer passion", staff_socket)
-    #analyze_channel_map("r51UJMj9M6Y")
-    '''
-    response = requests.get(
-        URL_COMMENT_THREAD + "?part=snippet" + "&key=" + API_KEY + "&maxResults=" + MAX_RESULT + "&videoId=" + "r51UJMj9M6Y" + "&order=relevance")
-    temp = json.loads(response.text)
-    author_channelId = item["snippet"]["topLevelComment"]["snippet"]["authorChannelId"]["value"]
-    next = "CAoQAA"
-    while True:
-        response2 = requests.get(URL_ACTIVITY + "?part=contentDetails" + "&key=" + API_KEY + "&maxResults=" + "10" + "&pageToken=" + next + "&channelId=" + author_channelId)
-        temp2 = json.loads(response2.text)
-        print(json.dumps(temp2, indent=4, ensure_ascii=False))
-    '''
+    # staff_socket = tcp.staff_ready(5002)
+    # tcp.staff_update(get_youtube_data_by_q, "summer passion", staff_socket)
+    get_youtube_data_by_q("여름옷")
+    # analyze_channel_map("r51UJMj9M6Y")
+    # print(API_KEY)
