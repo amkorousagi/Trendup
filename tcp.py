@@ -44,9 +44,9 @@ def youtube_data(staff_socket):
                 if data.decode() == "success":
                     print("youtube success")
                 else:
-                    print("0youtube" + data.decode())
+                    print("youtube" + data.decode())
             else:
-                print("1youtube" + data.decode())
+                print("youtube" + data.decode())
         elif STATE == "update":
             staff_socket.send("update".encode())
             data = staff_socket.recv(1024)
@@ -55,14 +55,13 @@ def youtube_data(staff_socket):
                 if data.decode() == "success":
                     print("youtube success")
                 else:
-                    print("0youtube" + data.decode())
+                    print("youtube" + data.decode())
             else:
-                print("1youtube" + data.decode())
+                print("youtube" + data.decode())
         else:
             print("wrong state")
 
         FLAG_YOUTUBE_DATA = False
-    print()
 
 
 def web_crawling(staff_socket):
@@ -81,7 +80,7 @@ def web_crawling(staff_socket):
                 if data.decode() == "success":
                     print("web crawling success")
                 else:
-                    print("0web crawling" + data.decode())
+                    print("web crawling" + data.decode())
             else:
                 print("web crawling" + data.decode())
         elif STATE == "update":
@@ -92,17 +91,17 @@ def web_crawling(staff_socket):
                 if data.decode() == "success":
                     print("web crawling success")
                 else:
-                    print("01web crawling" + data.decode())
+                    print("1web crawling" + data.decode())
             else:
-                print("1web crawling" + data.decode())
+                print("web crawling" + data.decode())
         else:
             print("wrong state")
 
         FLAG_WEB_CRAWLING = False
-    print()
 
 
 def graph_drawing(staff_socket):
+    global FLAG_GRAPH_DRAWING
     while True:
 
         while True:
@@ -133,10 +132,12 @@ def graph_drawing(staff_socket):
                 print("graph drawing" + data.decode())
         else:
             print("wrong state")
-    print()
+
+        FLAG_GRAPH_DRAWING = False
 
 
 def machine_learning(staff_socket):
+    global FLAG_MACHINE_LEARNING
     while True:
 
         while True:
@@ -167,19 +168,20 @@ def machine_learning(staff_socket):
                 print("machine learning" + data.decode())
         else:
             print("wrong state")
-    print()
+
+        FLAG_MACHINE_LEARNING = False
 
 
-def threaded(staff_socket, addr):
-    print('Connected by :', addr[0], ':', addr[1])
+def threaded(staff_socket, address):
+    print('Connected by :', address[0], ':', address[1])
 
-    if int(addr[1]) == 5002:
+    if int(address[1]) == 5002:
         youtube_data(staff_socket)
-    elif int(addr[1]) == 5003:
+    elif int(address[1]) == 5003:
         web_crawling(staff_socket)
-    elif int(addr[1]) == 5004:
+    elif int(address[1]) == 5004:
         graph_drawing(staff_socket)
-    elif int(addr[1]) == 5005:
+    elif int(address[1]) == 5005:
         machine_learning(staff_socket)
 
 
@@ -190,9 +192,9 @@ def master_ready():
     master_socket.listen()
     i = 0
     while i < SOCKET_AMOUNT:
-        staff_socket, addr = master_socket.accept()
+        staff_socket, address = master_socket.accept()
         i = i + 1
-        start_new_thread(threaded, (staff_socket, addr))
+        start_new_thread(threaded, (staff_socket, address))
 
     print("all container connected.")
 
@@ -243,10 +245,9 @@ def staff_init(func, argv_list, staff_socket):
         if res == 0:
             staff_socket.send("success".encode())
         else:
-            staff_socket.send(("fail %d" %res).encode())
+            staff_socket.send(("fail %d" % res).encode())
     else:
         staff_socket.send("wrong command".encode())
-    print()
 
 
 def master_update():
@@ -288,6 +289,5 @@ def staff_update(func, argv_list, staff_socket):
             staff_socket.send("fail 0".encode())
     else:
         staff_socket.send("wrong command".encode())
-    print()
 
 
