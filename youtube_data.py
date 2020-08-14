@@ -1,10 +1,10 @@
 # -*-coding:utf-8-*-
 # This is a sample Python script.
 
-# Press Shift+F10 to execute it or replace it with your code.
+# Press Shift+F10 to execute it[0] or replace it[0] with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 # print(json.dumps(pretty_json, indent=4, ensure_ascii=False))
-# export GOOGLE_APPLICATION_CREDENTIALS="/home/psc/TrendUp-090b119d90eb.json"
+# export GOOGLE_APPLICATION_CREDENTIALS="/home/psc/Trendup2020-39205bfb2ca5.json"
 
 
 import tcp
@@ -13,6 +13,8 @@ import json
 import requests
 from google.cloud import language_v1
 from google.cloud.language_v1 import enums
+import pymysql.cursors
+
 '''
 #python3 is default is utf8
 from importlib import reload
@@ -20,6 +22,10 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 '''
+
+QUERY_INSERT_YOUTUBE = "insert into youtube (rank, keyword, date_, gender, score) values(%s, %s, cast(now() as char), %s, %s)"
+QUERY_INSERT_YOUTUBE_LIVE = "insert into youtube_live (rank, keyword, date_, gender, score) values(%s, %s, cast(now() as char), %s, %s)"
+QUERY_DELETE_YOUTUBE_LIVE = "delete from youtube_live"
 
 URL_SEARCH = "https://www.googleapis.com/youtube/v3/search"
 URL_VIDEO = "https://www.googleapis.com/youtube/v3/videos"
@@ -29,7 +35,7 @@ API_KEY = ""
 with open("/home/psc/api_key.txt", "r") as file:
     API_KEY = file.read()
 MAX_RESULT = "5"
-MAX_PAGE = 5
+MAX_PAGE = 2
 MAX_CHANNEL = 100
 
 # https://www.googleapis.com/youtube/v3/videoCategories?&key=AIzaSyABYt3bjXmFzFyzZxJJut7J93Bv_3BkhUE&part=snippet&regionCode=KR&hl=ko_KR
@@ -37,6 +43,16 @@ MAX_CHANNEL = 100
 channel_dict = dict()
 channel_count = 0
 vector_2d_channel = [[0]*MAX_CHANNEL]*MAX_CHANNEL
+
+conn = pymysql.connect(
+    host="101.101.217.206",
+    port=3306,
+    user="trendup",
+    passwd="2020",
+    database="dbtrendup",
+    charset='utf8'
+)
+curs=conn.cursor()
 
 
 def get_keyword(text_content):
@@ -72,9 +88,11 @@ def get_keyword(text_content):
 
     # Loop through entitites returned from the API
     for entity in response.entities:
+        '''
         print("Representative name for the entity: {}".format(entity.name))
         print("Entity type: {}".format(enums.Entity.Type(entity.type).name))
         print("Salience score: {}".format(entity.salience))
+        '''
         if (
                 (enums.Entity.Type(entity.type).name == "PERSON" or
                 enums.Entity.Type(entity.type).name == "UNKNOWN" or
@@ -91,24 +109,44 @@ def get_keyword(text_content):
 def get_view_count_by_id(videoId):
     response = requests.get(URL_VIDEO + "?part=statistics" + "&key=" + API_KEY + "&id=" + videoId)
     temp = json.loads(response.text)
-    # print(json.dumps(temp, indent=4, ensure_ascii=False))
+    print(json.dumps(temp, indent=4, ensure_ascii=False))
     return temp["items"][0]["statistics"]["viewCount"]
 
 
 def get_youtube_data_by_q(q):
-    i = 0
+    '''&regionCode=KR&relevanceLanguage=ko'''
+    result_dict = dict()
+    cnt = 0
     is_next = False
     next = ""
     while True:
-        i += 1
+        cnt += 1
+        print(next)
         if is_next:
-            response = requests.get(URL_SEARCH + "?pageToken=" + next + "&part=snippet" + "&key=" + API_KEY + "&maxResults=" + MAX_RESULT + "&type=video&regionCode=KR&relevanceLanguage=ko")
+            response = requests.get(URL_SEARCH + "?q=" + q + "&pageToken=" + next + "&part=snippet" + "&key=" + API_KEY + "&maxResults=" + MAX_RESULT + "&type=video")
         else :
-            response = requests.get(URL_SEARCH + "?q=" + q + "&part=snippet" + "&key=" + API_KEY + "&maxResults=" + MAX_RESULT + "&type=video&regionCode=KR&relevanceLanguage=ko")
+            response = requests.get(URL_SEARCH + "?q=" + q + "&part=snippet" + "&key=" + API_KEY + "&maxResults=" + MAX_RESULT + "&type=video")
 
         res = json.loads(response.text)
-
+        
         for item in res["items"]:
+            
+            viewCount = int(get_view_count_by_id(item["id"]["videoId"]))
+            for i in get_keyword(item["snippet"]["title"]):
+                if i in result_dict.keys():
+                    result_dict[i] += viewCount
+                else:
+                    result_dict[i] = viewCount
+            '''
+            for i in get_keyword(item["snippet"]["description"]):
+                if i in result_dict.keys():
+                    result_dict[i] += viewCount
+                elif i != "여자":
+                    result_dict[i] = viewCount
+            '''
+            
+
+            '''
             get_view_count_by_id(item["id"]["videoId"])
             print("category:", q)
             print("keyword_title:")
@@ -117,8 +155,9 @@ def get_youtube_data_by_q(q):
             print("keyword_desc: {}".format(get_keyword(item["snippet"]["description"])))
             print("viewCount: {}".format(get_view_count_by_id(item["id"]["videoId"])))
             print("publish time: {}".format(item["snippet"]["publishTime"]))
+            '''
 
-        if i < MAX_PAGE :
+        if cnt < MAX_PAGE :
             # 더이상 자료가 없을때
             if "nextPageToken" in res:
                 next = res["nextPageToken"]
@@ -127,6 +166,22 @@ def get_youtube_data_by_q(q):
                 break
             continue
         break
+    sorted_result =sorted(result_dict.items(), key=lambda x: x[1], reverse=True)
+    cnt2=0
+    curs.execute(QUERY_DELETE_YOUTUBE_LIVE)
+    for it in sorted_result:
+        if( it[0].find("여자") != -1 or it[0].find("여성") != -1 or it[0][0].find("여름") != -1 or it[0].find("옷") != -1 or it[0].find("문제점") != -1 or it[0].find("공통") != -1 or it[0].find("코디") != -1
+        or it[0].find("패션") != -1 or it[0].find("남자") != -1 or it[0].find("남성") != -1 or it[0].find("입") != -1 or it[0].find("할인") != -1 or it[0].find("완전") != -1 or it[0].find("노하우") != -1
+        or it[0].find("계절별") != -1 or it[0].find("리뷰") != -1 or it[0].find("이유") != -1 or it[0].find("기본") != -1 or it[0].find("정리") != -1 or it[0].find("요청") != -1 or it[0].find("구독자") != -1
+        or it[0].find("모음") != -1 or it[0].find("추천") != -1 or it[0].find("!!") != -1 or it[0].find("그림") != -1 or it[0].find("팁") != -1 or it[0].find("성공") != -1 or it[0].find("증정") != -1
+        or it[0].find("옆") != -1 or it[0].find("친구") != -1 or it[0].find("템") != -1 or it[0].find("포함") != -1 or it[0].find("영상") != -1 or it[0].find("쿠폰") != -1 or it[0].find("언박싱") != -1) :
+            continue
+        cnt2+=1
+        curs.execute(QUERY_INSERT_YOUTUBE, (cnt2, it[0], "여자", str(it[1])))
+        curs.execute(QUERY_INSERT_YOUTUBE_LIVE, (cnt2, it[0], "여자", str(it[1])))
+        if cnt2 == 20:
+            break
+    print(sorted_result)
     return 0
 
 
@@ -182,6 +237,8 @@ def analyze_channel_map(videoId):
 if __name__ == '__main__':
     # staff_socket = tcp.staff_ready(5002)
     # tcp.staff_update(get_youtube_data_by_q, "summer passion", staff_socket)
-    get_youtube_data_by_q("여름옷")
+    get_youtube_data_by_q("여자여름옷")
+    conn.commit()
+    conn.close()
     # analyze_channel_map("r51UJMj9M6Y")
     # print(API_KEY)
