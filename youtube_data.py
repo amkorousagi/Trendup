@@ -27,6 +27,10 @@ QUERY_INSERT_YOUTUBE = "insert into youtube (rank, keyword, date_, gender, score
 QUERY_INSERT_YOUTUBE_LIVE = "insert into youtube_live (rank, keyword, date_, gender, score) values(%s, %s, cast(now() as char), %s, %s)"
 QUERY_DELETE_YOUTUBE_LIVE = "delete from youtube_live"
 
+QUERY_INSERT_YOUTUBE_MAP_NODE = "insert into youtube_map_node (channel_id, title, subscriber_count) values(%s, %s, %s)"
+QUERY_INSERT_YOUTUBE_MAP_EDGE = "insert into youtube_map_edge (source_id, target_id, size) values(%s, %s, %s)"
+
+URL_CHANNEL = "https://www.googleapis.com/youtube/v3/channels"
 URL_SEARCH = "https://www.googleapis.com/youtube/v3/search"
 URL_VIDEO = "https://www.googleapis.com/youtube/v3/videos"
 URL_COMMENT_THREAD = "https://www.googleapis.com/youtube/v3/commentThreads"
@@ -34,7 +38,7 @@ URL_ACTIVITY = "https://www.googleapis.com/youtube/v3/activities"
 API_KEY = ""
 with open("/home/psc/api_key.txt", "r") as file:
     API_KEY = file.read()
-MAX_RESULT = "5"
+MAX_RESULT = "10"
 MAX_PAGE = 2
 MAX_CHANNEL = 100
 
@@ -194,13 +198,13 @@ def analyze_channel_map(videoId):
     result_dict = dict()
     response = requests.get(URL_COMMENT_THREAD + "?part=snippet" + "&key=" + API_KEY + "&maxResults=" + MAX_RESULT + "&videoId=" + videoId + "&order=relevance")
     temp = json.loads(response.text)
-    # print(json.dumps(temp, indent=4, ensure_ascii=False))
+    print(json.dumps(temp, indent=4, ensure_ascii=False))
 
     for item in temp["items"]:
         author_channelId = item["snippet"]["topLevelComment"]["snippet"]["authorChannelId"]["value"]
         response2 = requests.get(URL_ACTIVITY + "?part=contentDetails" + "&key=" + API_KEY + "&maxResults=" + "10" + "&channelId=" + author_channelId)
         temp2 = json.loads(response2.text)
-
+        print(json.dumps(temp2, indent=4, ensure_ascii=False))
         if "nextPageToken" in temp2:
             i = 0
             is_next = False
@@ -220,6 +224,8 @@ def analyze_channel_map(videoId):
                 for channel in sub_channel:
                     result_dict.update({channel:{}})
                     for channel2 in sub_channel:
+                        # add
+                        # check existing key and update value++ (for checking common subscription)
                         if channel != channel2:
                             result_dict[channel].update({channel2:1})
                 print(result_dict)
@@ -233,11 +239,31 @@ def analyze_channel_map(videoId):
                     continue
                 break
 
+    return result_dict
+
+def make_map(result_dict):
+    result_dict = {'UCYwx4uxuwZ0i_hdjaHmWn-Q': {'UCBjSSuABxI9mIvDCkYV-Hnw': 1, 'UCFHOhnjF1KpoxpYfMn2pOKA': 1, 'UCkHIIJqbXrkq0TFChpthCVg': 1, 'UCk5bhZYNtbPJyNLRxN8D8NQ': 1, 'UCfldmTAkWErTcbiAA9GeVxg': 1, 'UCADOqr6bwKK4JuENxsoFDng': 1, 'UC-Bsa2ivAGWq7bsSPrPGFVA': 1, 'UCFCtZJTuJhE18k8IXwmXTYQ': 1, 'UCJ6ffXRHtnXLhM2MFYsOrhQ': 1}, 'UCBjSSuABxI9mIvDCkYV-Hnw': {'UCYwx4uxuwZ0i_hdjaHmWn-Q': 1, 'UCFHOhnjF1KpoxpYfMn2pOKA': 1, 'UCkHIIJqbXrkq0TFChpthCVg': 1, 'UCk5bhZYNtbPJyNLRxN8D8NQ': 1, 'UCfldmTAkWErTcbiAA9GeVxg': 1, 'UCADOqr6bwKK4JuENxsoFDng': 1, 'UC-Bsa2ivAGWq7bsSPrPGFVA': 1, 'UCFCtZJTuJhE18k8IXwmXTYQ': 1, 'UCJ6ffXRHtnXLhM2MFYsOrhQ': 1}, 'UCFHOhnjF1KpoxpYfMn2pOKA': {'UCYwx4uxuwZ0i_hdjaHmWn-Q': 1, 'UCBjSSuABxI9mIvDCkYV-Hnw': 1, 'UCkHIIJqbXrkq0TFChpthCVg': 1, 'UCk5bhZYNtbPJyNLRxN8D8NQ': 1, 'UCfldmTAkWErTcbiAA9GeVxg': 1, 'UCADOqr6bwKK4JuENxsoFDng': 1, 'UC-Bsa2ivAGWq7bsSPrPGFVA': 1, 'UCFCtZJTuJhE18k8IXwmXTYQ': 1, 'UCJ6ffXRHtnXLhM2MFYsOrhQ': 1}, 'UCkHIIJqbXrkq0TFChpthCVg': {'UCYwx4uxuwZ0i_hdjaHmWn-Q': 1, 'UCBjSSuABxI9mIvDCkYV-Hnw': 1, 'UCFHOhnjF1KpoxpYfMn2pOKA': 1, 'UCk5bhZYNtbPJyNLRxN8D8NQ': 1, 'UCfldmTAkWErTcbiAA9GeVxg': 1, 'UCADOqr6bwKK4JuENxsoFDng': 1, 'UC-Bsa2ivAGWq7bsSPrPGFVA': 1, 'UCFCtZJTuJhE18k8IXwmXTYQ': 1, 'UCJ6ffXRHtnXLhM2MFYsOrhQ': 1}, 'UCk5bhZYNtbPJyNLRxN8D8NQ': {'UCYwx4uxuwZ0i_hdjaHmWn-Q': 1, 'UCBjSSuABxI9mIvDCkYV-Hnw': 1, 'UCFHOhnjF1KpoxpYfMn2pOKA': 1, 'UCkHIIJqbXrkq0TFChpthCVg': 1, 'UCfldmTAkWErTcbiAA9GeVxg': 1, 'UCADOqr6bwKK4JuENxsoFDng': 1, 'UC-Bsa2ivAGWq7bsSPrPGFVA': 1, 'UCFCtZJTuJhE18k8IXwmXTYQ': 1, 'UCJ6ffXRHtnXLhM2MFYsOrhQ': 1}, 'UCfldmTAkWErTcbiAA9GeVxg': {'UCYwx4uxuwZ0i_hdjaHmWn-Q': 1, 'UCBjSSuABxI9mIvDCkYV-Hnw': 1, 'UCFHOhnjF1KpoxpYfMn2pOKA': 1, 'UCkHIIJqbXrkq0TFChpthCVg': 1, 'UCk5bhZYNtbPJyNLRxN8D8NQ': 1, 'UCADOqr6bwKK4JuENxsoFDng': 1, 'UC-Bsa2ivAGWq7bsSPrPGFVA': 1, 'UCFCtZJTuJhE18k8IXwmXTYQ': 1, 'UCJ6ffXRHtnXLhM2MFYsOrhQ': 1}, 'UCADOqr6bwKK4JuENxsoFDng': {'UCYwx4uxuwZ0i_hdjaHmWn-Q': 1, 'UCBjSSuABxI9mIvDCkYV-Hnw': 1, 'UCFHOhnjF1KpoxpYfMn2pOKA': 1, 'UCkHIIJqbXrkq0TFChpthCVg': 1, 'UCk5bhZYNtbPJyNLRxN8D8NQ': 1, 'UCfldmTAkWErTcbiAA9GeVxg': 1, 'UC-Bsa2ivAGWq7bsSPrPGFVA': 1, 'UCFCtZJTuJhE18k8IXwmXTYQ': 1, 'UCJ6ffXRHtnXLhM2MFYsOrhQ': 1}, 'UC-Bsa2ivAGWq7bsSPrPGFVA': {'UCYwx4uxuwZ0i_hdjaHmWn-Q': 1, 'UCBjSSuABxI9mIvDCkYV-Hnw': 1, 'UCFHOhnjF1KpoxpYfMn2pOKA': 1, 'UCkHIIJqbXrkq0TFChpthCVg': 1, 'UCk5bhZYNtbPJyNLRxN8D8NQ': 1, 'UCfldmTAkWErTcbiAA9GeVxg': 1, 'UCADOqr6bwKK4JuENxsoFDng': 1, 'UCFCtZJTuJhE18k8IXwmXTYQ': 1, 'UCJ6ffXRHtnXLhM2MFYsOrhQ': 1}, 'UCFCtZJTuJhE18k8IXwmXTYQ': {'UCYwx4uxuwZ0i_hdjaHmWn-Q': 1, 'UCBjSSuABxI9mIvDCkYV-Hnw': 1, 'UCFHOhnjF1KpoxpYfMn2pOKA': 1, 'UCkHIIJqbXrkq0TFChpthCVg': 1, 'UCk5bhZYNtbPJyNLRxN8D8NQ': 1, 'UCfldmTAkWErTcbiAA9GeVxg': 1, 'UCADOqr6bwKK4JuENxsoFDng': 1, 'UC-Bsa2ivAGWq7bsSPrPGFVA': 1, 'UCJ6ffXRHtnXLhM2MFYsOrhQ': 1}, 'UCJ6ffXRHtnXLhM2MFYsOrhQ': {'UCYwx4uxuwZ0i_hdjaHmWn-Q': 1, 'UCBjSSuABxI9mIvDCkYV-Hnw': 1, 'UCFHOhnjF1KpoxpYfMn2pOKA': 1, 'UCkHIIJqbXrkq0TFChpthCVg': 1, 'UCk5bhZYNtbPJyNLRxN8D8NQ': 1, 'UCfldmTAkWErTcbiAA9GeVxg': 1, 'UCADOqr6bwKK4JuENxsoFDng': 1, 'UC-Bsa2ivAGWq7bsSPrPGFVA': 1, 'UCFCtZJTuJhE18k8IXwmXTYQ': 1}, 'UCHKDlM4UOmtEBhwDTg8lqJQ': {'UCZuaBVFU70xJUTpHpkuav8g': 1, 'UCoC47do520os_4DBMEFGg4A': 1, 'UC6eAzxps7dpL7wfbVnunmgQ': 1, 'UCPtTNQQxoBF4Gzdw5o9Zc2g': 1, 'UC1of9ELYwB623fWaAMRDVFA': 1, 'UC9XkOhrpTs3ibUqvjQmT8uA': 1, 'UC8a6z7i9qypp9PqJ_0HhBrw': 1, 'UCZVD--cl8FLRn7kmSudAuBA': 1, 'UCuh6Br1vzgo1LivYgKvno5Q': 1}, 'UCZuaBVFU70xJUTpHpkuav8g': {'UCHKDlM4UOmtEBhwDTg8lqJQ': 1, 'UCoC47do520os_4DBMEFGg4A': 1, 'UC6eAzxps7dpL7wfbVnunmgQ': 1, 'UCPtTNQQxoBF4Gzdw5o9Zc2g': 1, 'UC1of9ELYwB623fWaAMRDVFA': 1, 'UC9XkOhrpTs3ibUqvjQmT8uA': 1, 'UC8a6z7i9qypp9PqJ_0HhBrw': 1, 'UCZVD--cl8FLRn7kmSudAuBA': 1, 'UCuh6Br1vzgo1LivYgKvno5Q': 1}, 'UCoC47do520os_4DBMEFGg4A': {'UCHKDlM4UOmtEBhwDTg8lqJQ': 1, 'UCZuaBVFU70xJUTpHpkuav8g': 1, 'UC6eAzxps7dpL7wfbVnunmgQ': 1, 'UCPtTNQQxoBF4Gzdw5o9Zc2g': 1, 'UC1of9ELYwB623fWaAMRDVFA': 1, 'UC9XkOhrpTs3ibUqvjQmT8uA': 1, 'UC8a6z7i9qypp9PqJ_0HhBrw': 1, 'UCZVD--cl8FLRn7kmSudAuBA': 1, 'UCuh6Br1vzgo1LivYgKvno5Q': 1}, 'UC6eAzxps7dpL7wfbVnunmgQ': {'UCHKDlM4UOmtEBhwDTg8lqJQ': 1, 'UCZuaBVFU70xJUTpHpkuav8g': 1, 'UCoC47do520os_4DBMEFGg4A': 1, 'UCPtTNQQxoBF4Gzdw5o9Zc2g': 1, 'UC1of9ELYwB623fWaAMRDVFA': 1, 'UC9XkOhrpTs3ibUqvjQmT8uA': 1, 'UC8a6z7i9qypp9PqJ_0HhBrw': 1, 'UCZVD--cl8FLRn7kmSudAuBA': 1, 'UCuh6Br1vzgo1LivYgKvno5Q': 1}, 'UCPtTNQQxoBF4Gzdw5o9Zc2g': {'UCHKDlM4UOmtEBhwDTg8lqJQ': 1, 'UCZuaBVFU70xJUTpHpkuav8g': 1, 'UCoC47do520os_4DBMEFGg4A': 1, 'UC6eAzxps7dpL7wfbVnunmgQ': 1, 'UC1of9ELYwB623fWaAMRDVFA': 1, 'UC9XkOhrpTs3ibUqvjQmT8uA': 1, 'UC8a6z7i9qypp9PqJ_0HhBrw': 1, 'UCZVD--cl8FLRn7kmSudAuBA': 1, 'UCuh6Br1vzgo1LivYgKvno5Q': 1}, 'UC1of9ELYwB623fWaAMRDVFA': {'UCHKDlM4UOmtEBhwDTg8lqJQ': 1, 'UCZuaBVFU70xJUTpHpkuav8g': 1, 'UCoC47do520os_4DBMEFGg4A': 1, 'UC6eAzxps7dpL7wfbVnunmgQ': 1, 'UCPtTNQQxoBF4Gzdw5o9Zc2g': 1, 'UC9XkOhrpTs3ibUqvjQmT8uA': 1, 'UC8a6z7i9qypp9PqJ_0HhBrw': 1, 'UCZVD--cl8FLRn7kmSudAuBA': 1, 'UCuh6Br1vzgo1LivYgKvno5Q': 1}, 'UC9XkOhrpTs3ibUqvjQmT8uA': {'UCHKDlM4UOmtEBhwDTg8lqJQ': 1, 'UCZuaBVFU70xJUTpHpkuav8g': 1, 'UCoC47do520os_4DBMEFGg4A': 1, 'UC6eAzxps7dpL7wfbVnunmgQ': 1, 'UCPtTNQQxoBF4Gzdw5o9Zc2g': 1, 'UC1of9ELYwB623fWaAMRDVFA': 1, 'UC8a6z7i9qypp9PqJ_0HhBrw': 1, 'UCZVD--cl8FLRn7kmSudAuBA': 1, 'UCuh6Br1vzgo1LivYgKvno5Q': 1}, 'UC8a6z7i9qypp9PqJ_0HhBrw': {'UCHKDlM4UOmtEBhwDTg8lqJQ': 1, 'UCZuaBVFU70xJUTpHpkuav8g': 1, 'UCoC47do520os_4DBMEFGg4A': 1, 'UC6eAzxps7dpL7wfbVnunmgQ': 1, 'UCPtTNQQxoBF4Gzdw5o9Zc2g': 1, 'UC1of9ELYwB623fWaAMRDVFA': 1, 'UC9XkOhrpTs3ibUqvjQmT8uA': 1, 'UCZVD--cl8FLRn7kmSudAuBA': 1, 'UCuh6Br1vzgo1LivYgKvno5Q': 1}, 'UCZVD--cl8FLRn7kmSudAuBA': {'UCHKDlM4UOmtEBhwDTg8lqJQ': 1, 'UCZuaBVFU70xJUTpHpkuav8g': 1, 'UCoC47do520os_4DBMEFGg4A': 1, 'UC6eAzxps7dpL7wfbVnunmgQ': 1, 'UCPtTNQQxoBF4Gzdw5o9Zc2g': 1, 'UC1of9ELYwB623fWaAMRDVFA': 1, 'UC9XkOhrpTs3ibUqvjQmT8uA': 1, 'UC8a6z7i9qypp9PqJ_0HhBrw': 1, 'UCuh6Br1vzgo1LivYgKvno5Q': 1}, 'UCuh6Br1vzgo1LivYgKvno5Q': {'UCHKDlM4UOmtEBhwDTg8lqJQ': 1, 'UCZuaBVFU70xJUTpHpkuav8g': 1, 'UCoC47do520os_4DBMEFGg4A': 1, 'UC6eAzxps7dpL7wfbVnunmgQ': 1, 'UCPtTNQQxoBF4Gzdw5o9Zc2g': 1, 'UC1of9ELYwB623fWaAMRDVFA': 1, 'UC9XkOhrpTs3ibUqvjQmT8uA': 1, 'UC8a6z7i9qypp9PqJ_0HhBrw': 1, 'UCZVD--cl8FLRn7kmSudAuBA': 1}}
+    for source in result_dict:
+        response = requests.get(URL_CHANNEL + "?part=snippet" + "&key=" + API_KEY + "&id=" + source)
+        temp = json.loads(response.text)
+        # print(temp)
+        title = temp["items"][0]["snippet"]["title"]
+        response = requests.get(URL_CHANNEL + "?part=statistics" + "&key=" + API_KEY+ "&id=" + source)
+        temp = json.loads(response.text)
+        subscription = temp["items"][0]["statistics"]["subscriberCount"]
+        curs.execute(QUERY_INSERT_YOUTUBE_MAP_NODE,(source, title, str(subscription)))
+        # print(title, subscription)
+        for target in result_dict[source]:
+            print(source, target, title, subscription)
+            curs.execute(QUERY_INSERT_YOUTUBE_MAP_EDGE,(source, target, str(result_dict[source][target])))
+
 
 if __name__ == '__main__':
     # staff_socket = tcp.staff_ready(5002)
     # tcp.staff_update(get_youtube_data_by_q, "summer passion", staff_socket)
-    get_youtube_data_by_q("여자여름옷")
+    # get_youtube_data_by_q("여자여름옷")
+    # analyze_channel_map("y-p_JSn9gqo")
+    make_map({})
     conn.commit()
     conn.close()
     # analyze_channel_map("r51UJMj9M6Y")
