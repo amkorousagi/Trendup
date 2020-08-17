@@ -15,7 +15,7 @@ conn = pymysql.connect(
     )
 curs=conn.cursor()
 ####################################################################
-keyword='남자반바지'
+keyword='티셔츠'
 ####################################################################
 sql1 = "select * from " + keyword + "_RawData;"
 query1 = str(sql1)
@@ -60,7 +60,7 @@ N_array = np.array(raw_data.iloc[:,1], dtype=float)
 #### Labeling
 k = 208
 for i in N_array:
-        if i > 50:
+        if i > 80:
                 All_Label[(k - 3) % 208] = 1
 
         k = k + 1
