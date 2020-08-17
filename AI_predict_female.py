@@ -36,7 +36,7 @@ for i in MLpredict_list:
         if SVM<KNN:
                 x=1
 
-        sql3 = "select * from " + keyword + "_MLpredict_female"
+        sql3 = "select * from " + keyword + "_MLpredict"
         query3 = str(sql3)
         curs.execute(query3)
         predict = curs.fetchall()
