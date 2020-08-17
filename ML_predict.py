@@ -48,9 +48,14 @@ for i in MLpredict_list:
         order=round(date/2.34)
 
         if predict[order][x]==1:
-                value4 = keyword
-                query4 = "insert into MLpredict (word,date_) values (%s,cast(now() as char));"
-                curs.execute(query4,value4)
+                if x==0:
+                        value4 = (keyword,KNN/4)
+                        query4 = "insert into MLpredict (word,accuracy,date_) values (%s,%s,cast(now() as char));"
+                        curs.execute(query4, value4)
+                if x==1:
+                        value4 = (keyword,SVM/4)
+                        query4 = "insert into MLpredict (word,accuracy,date_) values (%s,%s,cast(now() as char));"
+                        curs.execute(query4,value4)
 
 
 conn.commit()
