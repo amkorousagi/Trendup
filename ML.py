@@ -90,6 +90,10 @@ SVM_model = svm.SVC(kernel='rbf')
 SVM_model.fit(Training_All, Training_All_Label)
 SVM_predict=SVM_model.predict(date_array)
 
+sql1="delete from "+keyword+"_MLaccuracy"
+query1=str(sql1)
+curs.execute(query1)
+
 for i in range(Fold):
     s1 = 'values1=round(knnscore_Fold%d,4)'%(i+1)
     exec(s1)
@@ -110,6 +114,10 @@ for i in range(156):
     sql1 = "insert into " + keyword + "_MLpredict (KNN,SVM) values(%s,%s)"
     query1 = str(sql1)
     curs.execute(query1, value1)
+
+value2=keyword
+sql2="insert into MLpredict_list (word) values (%s)"
+curs.execute(sql2,value2)
 
 conn.commit()
 conn.close()
