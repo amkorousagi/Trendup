@@ -11,10 +11,10 @@ conn = pymysql.connect(
     )
 
 curs=conn.cursor()
-query5 = "delete from MLpredict;"
+query5 = "delete from MLpredict_male;"
 curs.execute(query5)
 
-query1 = "select * from MLpredict_list;"
+query1 = "select * from MLpredict_list_male;"
 curs.execute(query1)
 MLpredict_list=curs.fetchall()
 for i in MLpredict_list:
@@ -50,11 +50,11 @@ for i in MLpredict_list:
         if predict[order][x]==1:
                 if x==0:
                         value4 = (keyword,KNN/4)
-                        query4 = "insert into MLpredict (word,accuracy,date_) values (%s,%s,cast(now() as char));"
+                        query4 = "insert into MLpredict_male (word,accuracy,date_) values (%s,%s,cast(now() as char));"
                         curs.execute(query4, value4)
                 if x==1:
                         value4 = (keyword,SVM/4)
-                        query4 = "insert into MLpredict (word,accuracy,date_) values (%s,%s,cast(now() as char));"
+                        query4 = "insert into MLpredict_male (word,accuracy,date_) values (%s,%s,cast(now() as char));"
                         curs.execute(query4,value4)
 
 
