@@ -27,25 +27,25 @@ conn2 = pymysql.connect(
 curs1=conn1.cursor()
 curs2=conn2.cursor()
 
-query1="select * from keyword_live_male"
+query1="select * from keyword_live_female"
 curs1.execute(query1)
-keyword_male_array1=curs1.fetchall()
+keyword_female_array1=curs1.fetchall()
 
-keyword_male1=[]
-for i in keyword_male_array1:
-    keyword_male1.append(i[1])
+keyword_female1=[]
+for i in keyword_female_array1:
+    keyword_female1.append(i[1])
 
-query2="select * from MLpredict_list_male"
+query2="select * from MLpredict_list_female"
 curs1.execute(query2)
-keyword_male_array2=curs1.fetchall()
+keyword_female_array2=curs1.fetchall()
 
-keyword_male2=[]
-for i in keyword_male_array2:
-    keyword_male2.append(i[0])
+keyword_female2=[]
+for i in keyword_female_array2:
+    keyword_female2.append(i[0])
 
 keyword=[]
-for i in keyword_male1:
-    if i not in keyword_male2:
+for i in keyword_female1:
+    if i not in keyword_female2:
         keyword.append(i)
 
 for keyword in keyword:
@@ -447,7 +447,7 @@ for keyword in keyword:
         curs1.execute(query1, value1)
 
     value2 = keyword
-    sql2 = "insert into MLpredict_list_male (word) values (%s)"
+    sql2 = "insert into MLpredict_list_female (word) values (%s)"
     curs1.execute(sql2, value2)
 
 
