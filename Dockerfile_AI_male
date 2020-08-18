@@ -1,0 +1,34 @@
+FROM ubuntu:18.04
+
+MAINTAINER JYT 'jytprogramming@gmail.com'
+
+RUN apt-get update -y\
+        &&apt-get install vim -y\
+        &&apt-get upgrade -y\
+        &&apt-get install python -y\
+        &&apt-get install python-pip -y\
+        &&apt-get install git -y\
+        &&apt-get install python3 -y\
+        &&apt-get install python3-pip -y
+
+RUN pip3 install pandas -y\
+        &&pip3 install numpy -y\
+        &&pip3 install pymysql -y\
+        &&pip3 install sklearn -y
+        
+RUN git clone https://github.com/amkorousagi/Trendup.git
+
+EXPOSE 5001/tcp
+EXPOSE 5002/tcp
+EXPOSE 5003/tcp
+EXPOSE 5004/tcp
+EXPOSE 5005/tcp
+EXPOSE 5006/tcp
+EXPOSE 5007/tcp
+EXPOSE 5008/tcp
+EXPOSE 5009/tcp
+EXPOSE 5010/tcp
+
+
+
+CMD /bin/bash
