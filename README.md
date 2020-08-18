@@ -4,8 +4,13 @@ OIDC2020
 ## How to use Trendup?
 go to http://49.50.164.37:6002/ !
 
+## Where source code?
+front end: https://github.com/amkorousagi/trendup_front
+back end: https://github.com/amkorousagi/trendup_back
+data collection and machine learning: this repository!
+
 ### before run youtube_data container
-plz update your authentication information (API_KEY, service account json)
+plz update your authentication information (API_KEY, service account json) 
 
 ### before run master.py
 plz update your server's private IP by "hostname -I"
