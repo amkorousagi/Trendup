@@ -27,25 +27,25 @@ conn2 = pymysql.connect(
 curs1=conn1.cursor()
 curs2=conn2.cursor()
 
-query1="select * from keyword_live_female"
+query1="select * from keyword_live_male"
 curs1.execute(query1)
-keyword_female_array1=curs1.fetchall()
+keyword_male_array1=curs1.fetchall()
 
-keyword_female1=[]
-for i in keyword_female_array1:
-    keyword_female1.append(i[1])
+keyword_male1=[]
+for i in keyword_male_array1:
+    keyword_male1.append(i[1])
 
-query2="select * from MLpredict_list_female"
+query2="select * from MLpredict_list_male"
 curs1.execute(query2)
-keyword_female_array2=curs1.fetchall()
+keyword_male_array2=curs1.fetchall()
 
-keyword_female2=[]
-for i in keyword_female_array2:
-    keyword_female2.append(i[0])
+keyword_male2=[]
+for i in keyword_male_array2:
+    keyword_male2.append(i[0])
 
 keyword=[]
-for i in keyword_female1:
-    if i not in keyword_female2:
+for i in keyword_male1:
+    if i not in keyword_male2:
         keyword.append(i)
 
 for keyword in keyword:
@@ -264,8 +264,17 @@ for keyword in keyword:
     temp_Train = np.concatenate((date_array, date_array), axis=0)
     temp_Train_Final = np.concatenate((temp_Train, temp_Train), axis=0)
 
+    print(temp_Train_Final)
+    print(All_Label)
+
     Training_All = np.array(temp_Train_Final)
-    Training_All_Label = np.array(All_Label)
+    Training_All_Label1 = np.array(All_Label)
+    Training_All_Label=np.array([[0]],dtype=float)
+    for i in Training_All_Label1:
+        a=np.array([[i]])
+        Training_All_Label=np.concatenate((Training_All_Label,a),axis=0)
+
+    Training_All_Label = np.delete(Training_All_Label, 0, 0)
     Training_All_Label_forANN = np.array(All_Label_forANN)
 
     sql1 = 'create table Training_All_%s(n float(10))' % (keyword)
@@ -280,14 +289,15 @@ for keyword in keyword:
     query3 = str(sql3)
     curs2.execute(query3)
 
-
+    print(Training_All)
+    print(Training_All_Label)
     for i in Training_All:
         sql1='insert into Training_All_%s (n) values (%s)' % (keyword,str(i[0]))
         query1=str(sql1)
         curs2.execute(query1)
 
     for i in Training_All_Label:
-        sql1='insert into Training_All_Label_%s (n) values (%s)'% (keyword,str(i))
+        sql1='insert into Training_All_Label_%s (n) values (%s)'% (keyword,str(i[0]))
         query1 = str(sql1)
         curs2.execute(query1)
 
@@ -369,76 +379,76 @@ for keyword in keyword:
     c3 = 'Training_All_Label_forANN = np.array(array3)'
     exec(c3)
 
+    ############   KNN
 
-############   KNN
+    for i in range(Fold):
+        c1 = 'Training_CurrentFold = Training_Fold%d' % (i + 1)
+        exec(c1)
+        c2 = 'Validation_CurrentFold = Validation_Fold%d' % (i + 1)
+        exec(c2)
 
-for i in range(Fold):
-    c1 = 'Training_CurrentFold = Training_Fold%d' % (i + 1)
-    exec(c1)
-    c2 = 'Validation_CurrentFold = Validation_Fold%d' % (i + 1)
-    exec(c2)
-
-    c3 = 'knnModel_CurrentFold = KNeighborsClassifier(n_neighbors = 3).fit(Training_CurrentFold , TrainingFold_Label%d.ravel())' % (
+        c3 = 'knnModel_CurrentFold = KNeighborsClassifier(n_neighbors = 3).fit(Training_CurrentFold , TrainingFold_Label%d.ravel())' % (
                 i + 1)
-    exec(c3)
-    c4 = 'knnscore_Fold%d = knnModel_CurrentFold.score(Validation_CurrentFold , ValidationFold_Label%d)' % (
-    i + 1, i + 1)
-    exec(c4)
+        exec(c3)
+        c4 = 'knnscore_Fold%d = knnModel_CurrentFold.score(Validation_CurrentFold , ValidationFold_Label%d)' % (
+            i + 1, i + 1)
+        exec(c4)
 
-KNN_model = KNeighborsClassifier(n_neighbors = 3).fit(Training_All , Training_All_Label)
-KNN_predict=KNN_model.predict(date_array)
+    KNN_model = KNeighborsClassifier(n_neighbors=3).fit(Training_All, Training_All_Label.ravel())
+    KNN_predict = KNN_model.predict(date_array)
 
+    ############   SVM
+    for i in range(Fold):
+        c1 = 'Training_CurrentFold = Training_Fold%d' % (i + 1)
+        exec(c1)
+        c2 = 'Validation_CurrentFold = Validation_Fold%d' % (i + 1)
+        exec(c2)
 
-############   SVM
-for i in range(Fold):
-    c1 = 'Training_CurrentFold = Training_Fold%d' % (i + 1)
-    exec(c1)
-    c2 = 'Validation_CurrentFold = Validation_Fold%d' % (i + 1)
-    exec(c2)
+        svmModel_CurrentFold = svm.SVC(kernel='rbf')
+        c3 = 'svmModel_CurrentFold.fit(Training_CurrentFold , TrainingFold_Label%d.ravel())' % (i + 1)
+        exec(c3)
+        Predicted = np.array(svmModel_CurrentFold.predict(Validation_CurrentFold))
 
-    svmModel_CurrentFold = svm.SVC(kernel='rbf')
-    c3 = 'svmModel_CurrentFold.fit(Training_CurrentFold , TrainingFold_Label%d.ravel())' % (i + 1)
-    exec(c3)
-    Predicted = np.array(svmModel_CurrentFold.predict(Validation_CurrentFold))
+        c4 = 'svmscore_Fold%d = metrics.accuracy_score(ValidationFold_Label%d , Predicted)' % (i + 1, i + 1)
+        exec(c4)
 
-    c4 = 'svmscore_Fold%d = metrics.accuracy_score(ValidationFold_Label%d , Predicted)' % (i + 1, i + 1)
-    exec(c4)
+    SVM_model = svm.SVC(kernel='rbf')
+    SVM_model.fit(Training_All, Training_All_Label.ravel())
+    SVM_predict = SVM_model.predict(date_array)
 
-SVM_model = svm.SVC(kernel='rbf')
-SVM_model.fit(Training_All, Training_All_Label)
-SVM_predict=SVM_model.predict(date_array)
+    #################################################
 
-
-#################################################
-
-sql1="delete from "+keyword+"_MLaccuracy"
-query1=str(sql1)
-curs1.execute(query1)
-
-for i in range(Fold):
-    s1 = 'values1=round(knnscore_Fold%d,4)'%(i+1)
-    exec(s1)
-    s2 = 'values2=round(svmscore_Fold%d,4)' % (i + 1)
-    exec(s2)
-    values1=values1*100
-    values1=str(values1)
-    values2 = values2 * 100
-    values2 = str(values2)
-    values=(values1,values2)
-    values=(values1,values2)
-    sql1 = "insert into "+keyword+"_MLaccuracy (KNN,SVM) values(%s,%s)"
+    sql1 = "create table " + keyword + "_MLaccuracy (KNN float(10),SVM float(10))"
+    sql2 = "create table " + keyword + "_MLpredict (KNN float(10),SVM float(10))"
     query1 = str(sql1)
-    curs1.execute(query1,values)
+    query2 = str(sql2)
+    curs1.execute(query1)
+    curs1.execute(query2)
 
-for i in range(156):
-    value1=(str(KNN_predict[i]),str(SVM_predict[i]))
-    sql1 = "insert into " + keyword + "_MLpredict (KNN,SVM) values(%s,%s)"
-    query1 = str(sql1)
-    curs.execute(query1, value1)
+    for i in range(Fold):
+        s1 = 'values1=round(knnscore_Fold%d,4)' % (i + 1)
+        exec(s1)
+        s2 = 'values2=round(svmscore_Fold%d,4)' % (i + 1)
+        exec(s2)
+        values1 = values1 * 100
+        values1 = str(values1)
+        values2 = values2 * 100
+        values2 = str(values2)
+        values = (values1, values2)
+        values = (values1, values2)
+        sql1 = "insert into " + keyword + "_MLaccuracy (KNN,SVM) values(%s,%s)"
+        query1 = str(sql1)
+        curs1.execute(query1, values)
 
-value2=keyword
-sql2="insert into MLpredict_list_female (word) values (%s)"
-curs1.execute(sql2,value2)
+    for i in range(156):
+        value1 = (str(KNN_predict[i]), str(SVM_predict[i]))
+        sql1 = "insert into " + keyword + "_MLpredict (KNN,SVM) values(%s,%s)"
+        query1 = str(sql1)
+        curs1.execute(query1, value1)
+
+    value2 = keyword
+    sql2 = "insert into MLpredict_list_male (word) values (%s)"
+    curs1.execute(sql2, value2)
 
 
 
