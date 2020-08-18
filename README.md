@@ -2,7 +2,7 @@
 OIDC2020
 
 ## How to use Trendup?
-go to 49.50.164.37:6001 !
+go to http://49.50.164.37:6002/ !
 
 ### before run youtube_data container
 plz update your authentication information (API_KEY, service account json)
