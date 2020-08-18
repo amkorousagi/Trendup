@@ -48,7 +48,8 @@ for i in keyword_male1:
     if i not in keyword_male2:
         keyword.append(i)
 
-for keyword in keyword:
+keyword_test['후드집업']
+for keyword in keyword_test:
     sql1 = "select * from " + keyword + "_RawData;"
     query1 = str(sql1)
     curs1.execute(query1)
