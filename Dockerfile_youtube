@@ -30,7 +30,7 @@ EXPOSE 5010/tcp
 
 # when run builded image
 # CMD
-#ENTRYPOINT /bin/bash
+# ENTRYPOINT /bin/bash
 
 # when run
 # docker run --rm -it -p <external port>:<container port> --name <container name> <docker imamge id or name> <command>

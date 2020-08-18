@@ -13,28 +13,43 @@ MASTER_PUBLIC_IP = "49.50.164.37"
 MASTER_PRIVATE_IP = "172.17.0.4 " #this may not work , please find your private ip by "hostname -I" command
 STAFF_IP = "0.0.0.0"
 MASTER_PORT = 5001
-YOUTUBE_DATA_PORT = 5002
+YOUTUBE_DATA_PORT1 = 5002
+YOUTUBE_DATA_PORT2 = 5003
+YOUTUBE_MAP_PORT = 5004
+'''
 WEB_CRAWLING_PORT = 5003
 GRAPH_DRAWING_PORT = 5004
 MACHINE_LEARNING_PORT = 5005
-MAX_PORT_NUM = 5005
+'''
+MAX_PORT_NUM = 5004
 
-SOCKET_AMOUNT = 2
+SOCKET_AMOUNT = 3
 sockets = []
-FLAG_YOUTUBE_DATA = False
-FLAG_WEB_CRAWLING = False
-FLAG_GRAPH_DRAWING = False
-FLAG_MACHINE_LEARNING = False
+
+FLAG_YOUTUBE_DATA1 = False
+FLAG_YOUTUBE_DATA2 = False
+FLAG_YOUTUBE_MAP = False
+
+'''
+FLAG_N_SHOPPING = False
+FLAG_G_MARKET = False
+FLAG_11_STREET = False
+FLAG_KEYWORD_RANK = False
+FLAG_MALE_ML = False
+FLAG_FEMALE_ML = False
+FLAG_MALE_PREDICT = False
+FLAG_FEMALE_PREDICT = False
+'''
 STATE = "none"
 
 
-def youtube_data(staff_socket):
-    global FLAG_YOUTUBE_DATA
+def youtube_data1(staff_socket):
+    global FLAG_YOUTUBE_DATA1
     while True:
 
         while True:
             time.sleep(0.5)
-            if FLAG_YOUTUBE_DATA:
+            if FLAG_YOUTUBE_DATA1:
                 break
         if STATE == "init":
             staff_socket.send("init".encode())
@@ -61,9 +76,80 @@ def youtube_data(staff_socket):
         else:
             print("wrong state")
 
-        FLAG_YOUTUBE_DATA = False
+        FLAG_YOUTUBE_DATA1 = False
+
+def youtube_data2(staff_socket):
+    global FLAG_YOUTUBE_DATA2
+    while True:
+
+        while True:
+            time.sleep(0.5)
+            if FLAG_YOUTUBE_DATA2:
+                break
+        if STATE == "init":
+            staff_socket.send("init".encode())
+            data = staff_socket.recv(1024)
+            if data.decode() == "start init":
+                data = staff_socket.recv(1024)
+                if data.decode() == "success":
+                    print("youtube success")
+                else:
+                    print("youtube" + data.decode())
+            else:
+                print("youtube" + data.decode())
+        elif STATE == "update":
+            staff_socket.send("update".encode())
+            data = staff_socket.recv(1024)
+            if data.decode() == "start update":
+                data = staff_socket.recv(1024)
+                if data.decode() == "success":
+                    print("youtube success")
+                else:
+                    print("youtube" + data.decode())
+            else:
+                print("youtube" + data.decode())
+        else:
+            print("wrong state")
+
+        FLAG_YOUTUBE_DATA2 = False
+
+def youtube_map(staff_socket):
+    global FLAG_YOUTUBE_MAP
+    while True:
+
+        while True:
+            time.sleep(0.5)
+            if FLAG_YOUTUBE_MAP:
+                break
+        if STATE == "init":
+            staff_socket.send("init".encode())
+            data = staff_socket.recv(1024)
+            if data.decode() == "start init":
+                data = staff_socket.recv(1024)
+                if data.decode() == "success":
+                    print("youtube success")
+                else:
+                    print("youtube" + data.decode())
+            else:
+                print("youtube" + data.decode())
+        elif STATE == "update":
+            staff_socket.send("update".encode())
+            data = staff_socket.recv(1024)
+            if data.decode() == "start update":
+                data = staff_socket.recv(1024)
+                if data.decode() == "success":
+                    print("youtube success")
+                else:
+                    print("youtube" + data.decode())
+            else:
+                print("youtube" + data.decode())
+        else:
+            print("wrong state")
+
+        FLAG_YOUTUBE_MAP = False
 
 
+'''
 def web_crawling(staff_socket):
     global FLAG_WEB_CRAWLING
     while True:
@@ -171,19 +257,23 @@ def machine_learning(staff_socket):
 
         FLAG_MACHINE_LEARNING = False
 
-
+'''
 def threaded(staff_socket, address):
     print('Connected by :', address[0], ':', address[1])
 
     if int(address[1]) == 5002:
-        youtube_data(staff_socket)
+        youtube_data1(staff_socket)
     elif int(address[1]) == 5003:
+        youtube_data2(staff_socket)
+    elif int(address[1]) == 5004:
+        youtube_map(staff_socket)
+        '''
         web_crawling(staff_socket)
     elif int(address[1]) == 5004:
         graph_drawing(staff_socket)
     elif int(address[1]) == 5005:
         machine_learning(staff_socket)
-
+'''
 
 def master_ready():
     master_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -214,25 +304,24 @@ def staff_ready(role_port_num):
 def master_init():
     global STATE
     STATE = "init"
-    global FLAG_YOUTUBE_DATA
-    FLAG_YOUTUBE_DATA = True
-    global FLAG_WEB_CRAWLING
-    FLAG_WEB_CRAWLING = True
+    global FLAG_YOUTUBE_DATA1
+    FLAG_YOUTUBE_DATA1 = True
+    global FLAG_YOUTUBE_DATA2
+    FLAG_YOUTUBE_DATA2 = True
 
     while True:
         time.sleep(0.5)
-        if not (FLAG_WEB_CRAWLING or FLAG_YOUTUBE_DATA):
+        if not (FLAG_YOUTUBE_DATA1 or FLAG_YOUTUBE_DATA2):
             break
-
-    global FLAG_GRAPH_DRAWING
-    global FLAG_MACHINE_LEARNING
-    FLAG_GRAPH_DRAWING = True
-    FLAG_MACHINE_LEARNING = True
+    print("both youtube data1 and youtube data2 are finished")
+    global FLAG_YOUTUBE_MAP
+    FLAG_YOUTUBE_MAP = True
 
     while True:
         time.sleep(0.5)
-        if not (FLAG_GRAPH_DRAWING or FLAG_MACHINE_LEARNING):
+        if not (FLAG_YOUTUBE_MAP):
             break
+    print("youtube map is finished")
 
     print("initialization is finished")
 
@@ -253,30 +342,26 @@ def staff_init(func, argv_list, staff_socket):
 def master_update():
     global STATE
     STATE = "update"
-    global FLAG_YOUTUBE_DATA
-    FLAG_YOUTUBE_DATA = True
-    global FLAG_WEB_CRAWLING
-    FLAG_WEB_CRAWLING = True
+    global FLAG_YOUTUBE_DATA1
+    FLAG_YOUTUBE_DATA1 = True
+    global FLAG_YOUTUBE_DATA2
+    FLAG_YOUTUBE_DATA2 = True
 
     while True:
         time.sleep(0.5)
-        if not (FLAG_WEB_CRAWLING or FLAG_YOUTUBE_DATA):
+        if not (FLAG_YOUTUBE_DATA1 or FLAG_YOUTUBE_DATA2):
             break
-    print("update is half finished")
-    return
-    
-    global FLAG_GRAPH_DRAWING
-    global FLAG_MACHINE_LEARNING
-    FLAG_GRAPH_DRAWING = True
-    FLAG_MACHINE_LEARNING = True
+    print("both youtube data1 and youtube data2 are finished")
+    global FLAG_YOUTUBE_MAP
+    FLAG_YOUTUBE_MAP = True
 
     while True:
         time.sleep(0.5)
-        if not (FLAG_GRAPH_DRAWING or FLAG_MACHINE_LEARNING):
+        if not (FLAG_YOUTUBE_MAP):
             break
+    print("youtube map is finished")
 
     print("update is finished")
-
 
 def staff_update(func, argv_list, staff_socket):
     data = staff_socket.recv(1024)
