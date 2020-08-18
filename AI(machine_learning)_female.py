@@ -264,8 +264,6 @@ for keyword in keyword:
     temp_Train = np.concatenate((date_array, date_array), axis=0)
     temp_Train_Final = np.concatenate((temp_Train, temp_Train), axis=0)
 
-    print(temp_Train_Final)
-    print(All_Label)
 
     Training_All = np.array(temp_Train_Final)
     Training_All_Label1 = np.array(All_Label)
@@ -288,9 +286,8 @@ for keyword in keyword:
     sql3 = 'create table Training_All_Label_forANN_%s(n1 float(10),n2 float(10))' % (keyword)
     query3 = str(sql3)
     curs2.execute(query3)
-
-    print(Training_All)
-    print(Training_All_Label)
+    
+    
     for i in Training_All:
         sql1='insert into Training_All_%s (n) values (%s)' % (keyword,str(i[0]))
         query1=str(sql1)
