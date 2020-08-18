@@ -48,6 +48,7 @@ for i in keyword_female1:
     if i not in keyword_female2:
         keyword.append(i)
 
+############ 키워드 랭크에 새로운 키워드가 업데이트 되었을 때 특징 추출 + 머신러닝############
 for keyword in keyword:
     sql1 = "select * from " + keyword + "_RawData;"
     query1 = str(sql1)
@@ -62,6 +63,7 @@ for keyword in keyword:
     Fold = 4
     NoOfFold_Data = int(NoOfData / Fold)
 
+    #####특징 추출
     N_Feature = np.zeros((Fold, NoOfSensor * NoOfFeature))
     raw_data = pd.DataFrame(raw_data)
     for i in range(Fold):
@@ -169,7 +171,7 @@ for keyword in keyword:
             query4=str(sql4)
             curs2.execute(query4)
 
-
+    ###########  k-fold 
     NoOfData = int(raw_data.shape[0])
     Fold = 4
     NoOfFold_Data = int(NoOfData / Fold)
@@ -303,10 +305,7 @@ for keyword in keyword:
         query1 = str(sql1)
         curs2.execute(query1)
 
-
-##############################################################################################
-
-#############################################################################################
+        
     Fold = 4
 
     date_array = np.array([[0]], dtype=int)
