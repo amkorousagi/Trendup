@@ -14,7 +14,8 @@ RUN apt-get update -y\
 RUN pip3 install pandas -y\
         &&pip3 install numpy -y\
         &&pip3 install pymysql -y\
-        &&pip3 install sklearn -y
+        &&pip3 install sklearn -y\
+        &&pip3 install time -y
         
 RUN git clone https://github.com/amkorousagi/Trendup.git
 
@@ -28,7 +29,7 @@ EXPOSE 5007/tcp
 EXPOSE 5008/tcp
 EXPOSE 5009/tcp
 EXPOSE 5010/tcp
-
+EXPOSE 5011/tcp
 
 
 CMD /bin/bash
