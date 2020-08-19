@@ -97,7 +97,7 @@ def _11_shopping(lst):
         for j in keyword2:
             gender_=swithch_gender(i)
             values1=(str(k),j[0],str(swithch_gender(i)),str(j[1]))
-            query1="insert into 11_shopping (rank,keyword,date_,gender,score) values(%s,%s,cast(now() as char),%s,%s)"
+            query1="insert into _11_shopping (rank,keyword,date_,gender,score) values(%s,%s,cast(now() as char),%s,%s)"
 
             curs.execute(query1,values1)
 
