@@ -260,7 +260,7 @@ def make_map(result_dict):
         curs.execute(QUERY_INSERT_YOUTUBE_MAP_NODE,(source, title, str(subscription)))
         # print(title, subscription)
         for target in result_dict[source]:
-            print(source, target, title, subscription)
+            # print(source, target, title, subscription)
             curs.execute(QUERY_INSERT_YOUTUBE_MAP_EDGE,(source, target, str(result_dict[source][target])))
 
 def do_map(no):

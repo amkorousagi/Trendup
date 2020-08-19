@@ -83,7 +83,7 @@ def get_keyword(text_content):
     # For list of supported languages:
     # https://cloud.google.com/natural-language/docs/languages
     language = detect(text_content)
-    print(language)
+    # print(language)
     if not (language == "en" or language == "ko"):
         return lst
 
@@ -117,7 +117,7 @@ def get_keyword(text_content):
 def get_view_count_by_id(videoId):
     response = requests.get(URL_VIDEO + "?part=statistics" + "&key=" + API_KEY + "&id=" + videoId)
     temp = json.loads(response.text)
-    print(json.dumps(temp, indent=4, ensure_ascii=False))
+    # print(json.dumps(temp, indent=4, ensure_ascii=False))
     return temp["items"][0]["statistics"]["viewCount"]
 
 
@@ -129,7 +129,7 @@ def get_youtube_data_by_q(q):
     next = ""
     while True:
         cnt += 1
-        print(next)
+        # print(next)
         if is_next:
             response = requests.get(URL_SEARCH + "?q=" + q + "&pageToken=" + next + "&part=snippet" + "&key=" + API_KEY + "&maxResults=" + MAX_RESULT + "&type=video")
         else :
@@ -189,7 +189,7 @@ def get_youtube_data_by_q(q):
         curs.execute(QUERY_INSERT_YOUTUBE_LIVE, (cnt2, it[0], "여자", str(it[1])))
         if cnt2 == 20:
             break
-    print(sorted_result)
+    # print(sorted_result)
     return 0
 
 
@@ -202,13 +202,13 @@ def analyze_channel_map(videoId):
     result_dict = dict()
     response = requests.get(URL_COMMENT_THREAD + "?part=snippet" + "&key=" + API_KEY + "&maxResults=" + MAX_RESULT + "&videoId=" + videoId + "&order=relevance")
     temp = json.loads(response.text)
-    print(json.dumps(temp, indent=4, ensure_ascii=False))
+    #print(json.dumps(temp, indent=4, ensure_ascii=False))
 
     for item in temp["items"]:
         author_channelId = item["snippet"]["topLevelComment"]["snippet"]["authorChannelId"]["value"]
         response2 = requests.get(URL_ACTIVITY + "?part=contentDetails" + "&key=" + API_KEY + "&maxResults=" + "10" + "&channelId=" + author_channelId)
         temp2 = json.loads(response2.text)
-        print(json.dumps(temp2, indent=4, ensure_ascii=False))
+        # print(json.dumps(temp2, indent=4, ensure_ascii=False))
         if "nextPageToken" in temp2:
             i = 0
             is_next = False
@@ -221,7 +221,7 @@ def analyze_channel_map(videoId):
                     response2 = requests.get(URL_ACTIVITY + "?part=contentDetails" + "&key=" + API_KEY + "&maxResults=" + "10" + "&channelId=" + author_channelId)
 
                 temp2 = json.loads(response2.text)
-                print(json.dumps(temp2, indent=4, ensure_ascii=False))
+                #print(json.dumps(temp2, indent=4, ensure_ascii=False))
                 sub_channel = []
                 for item2 in temp2["items"]:
                     sub_channel.append(item2["contentDetails"]["subscription"]["resourceId"]["channelId"])
@@ -232,7 +232,7 @@ def analyze_channel_map(videoId):
                         # check existing key and update value++ (for checking common subscription)
                         if channel != channel2:
                             result_dict[channel].update({channel2:1})
-                print(result_dict)
+                #print(result_dict)
 
                 if i < MAX_PAGE :
                     if "nextPageToken" in temp2:
