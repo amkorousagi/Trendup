@@ -63,8 +63,6 @@ def youtube_thread():
 
         global FLAG_YOUTUBE_DATA
         FLAG_YOUTUBE_DATA = True
-        global FLAG_YOUTUBE_MAP
-        FLAG_YOUTUBE_MAP = True
 
         while True:
             time.sleep(0.5)
