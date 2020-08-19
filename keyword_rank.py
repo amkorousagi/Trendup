@@ -101,7 +101,7 @@ def  keyword_rank(lst):
         query1 = "insert into keyword_live_female (rank,keyword,date_,gender,score) values(%s,%s,cast(now() as char),%s,%s)"
         curs.execute(query1, values1)
         rank = rank + 1
-
+    return 0
 
 
 staff_socket = tcp.staff_ready(5007)
