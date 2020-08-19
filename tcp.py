@@ -549,9 +549,9 @@ def master_ready():
         i = i + 1
         start_new_thread(threaded, (staff_socket, address))
     
-    start_new_thread(youtube_thread)
-    start_new_thread(webcrawling_thread)
-    start_new_thread(ml_thread)
+    start_new_thread(youtube_thread, ())
+    start_new_thread(webcrawling_thread, ())
+    start_new_thread(ml_thread, ())
 
     print("all container connected.")
 
