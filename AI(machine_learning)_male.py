@@ -34,7 +34,11 @@ curs1.execute(query1)
 keyword_male_array1 = curs1.fetchall()
 
 keyword_male1 = []
+k=0
 for i in keyword_male_array1:
+    k = k + 1
+    if k ==10: ####상위 10개에 대해서만 머신러닝 및 특징 추출
+        break
     keyword_male1.append(i[1])
 
 query2 = "select * from MLpredict_list_male"
