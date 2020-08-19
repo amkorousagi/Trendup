@@ -2,53 +2,58 @@ import pandas as pd
 import numpy as np
 import pymysql.cursors
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn import svm,metrics
+from sklearn import svm, metrics
 
-def rms(x): # RMS 함수 정의
-    return np.sqrt(np.mean(x**2))
+
+def rms(x):  # RMS 함수 정의
+    return np.sqrt(np.mean(x ** 2))
+
 
 conn1 = pymysql.connect(
-        host="101.101.217.206",
-        port=3306,
-        user="trendup",
-        passwd="2020",
-        database="dbtrendup",
-        charset='utf8'
-    )
+    host="101.101.217.206",
+    port=3306,
+    user="trendup",
+    passwd="2020",
+    database="dbtrendup",
+    charset='utf8'
+)
 
 conn2 = pymysql.connect(
-        host="101.101.217.206",
-        port=3306,
-        user="trendup",
-        passwd="2020",
-        database="dbML",
-        charset='utf8'
-    )
-curs1=conn1.cursor()
-curs2=conn2.cursor()
+    host="101.101.217.206",
+    port=3306,
+    user="trendup",
+    passwd="2020",
+    database="dbML",
+    charset='utf8'
+)
+curs1 = conn1.cursor()
+curs2 = conn2.cursor()
 
-query1="select * from keyword_live_female"
+query1 = "select * from keyword_live_male"
 curs1.execute(query1)
-keyword_female_array1=curs1.fetchall()
+keyword_female_array1 = curs1.fetchall()
 
-keyword_female1=[]
+keyword_female1 = []
 for i in keyword_female_array1:
     keyword_female1.append(i[1])
 
-query2="select * from MLpredict_list_female"
+query2 = "select * from MLpredict_list_female"
 curs1.execute(query2)
-keyword_female_array2=curs1.fetchall()
+keyword_female_array2 = curs1.fetchall()
 
-keyword_female2=[]
+keyword_female2 = []
 for i in keyword_female_array2:
     keyword_female2.append(i[0])
 
-keyword=[]
+keyword = []
 for i in keyword_female1:
     if i not in keyword_female2:
         keyword.append(i)
 
-############ 키워드 랭크에 새로운 키워드가 업데이트 되었을 때 특징 추출 + 머신러닝############
+
+### 업데이트된 키워드 rank table에 이전에 머신러닝을 돌리지 않은 
+### 키워드가 업데이트 되면 자동 머신러닝
+
 for keyword in keyword:
     sql1 = "select * from " + keyword + "_RawData;"
     query1 = str(sql1)
@@ -63,7 +68,6 @@ for keyword in keyword:
     Fold = 4
     NoOfFold_Data = int(NoOfData / Fold)
 
-    #####특징 추출
     N_Feature = np.zeros((Fold, NoOfSensor * NoOfFeature))
     raw_data = pd.DataFrame(raw_data)
     for i in range(Fold):
@@ -78,7 +82,7 @@ for keyword in keyword:
     N_Feature = np.array(N_Feature, dtype=object)
     N_Feature_Data = pd.DataFrame(N_Feature)
 
-    sql2 = "create table "+keyword+"_DataFeature(max int(200),min int(200),mean int(200),rms int(200),var int(200))"
+    sql2 = "create table " + keyword + "_DataFeature(max int(200),min int(200),mean int(200),rms int(200),var int(200))"
     query2 = str(sql2)
     curs1.execute(query2)
     #### 특징 저장
@@ -96,26 +100,19 @@ for keyword in keyword:
     #### Labeling
     k = 208
     for i in N_array:
-        if i > 80:
+        if i > 80:    ###### 라벨링 조건 - 3주후 키워드 검색수가 80회를 넘는 경우 - 1
             All_Label[(k - 3) % 208] = 1
 
         k = k + 1
 
+
+    All_Label[NoOfFold_Data-1] = 1
+    All_Label[NoOfFold_Data*2-1] = 1
+    All_Label[NoOfFold_Data*3-1] = 1
+    All_Label[NoOfFold_Data*4-1] = 1
+
     All_Label = pd.Series(All_Label)
 
-    All_Label_forANN = np.zeros((NoOfData, 2))
-
-
-    k = 0
-    for i in N_array:
-        if i > 80:
-            All_Label_forANN[k, 1] = 1
-        else:
-            All_Label_forANN[k, 0] = 1
-
-        k = k + 1
-
-    All_Label_forANN = pd.DataFrame(All_Label_forANN)
 
     NoOfData = int(raw_data.shape[0])
     Fold = 4
@@ -149,29 +146,28 @@ for keyword in keyword:
         exec(s)
 
     for i in range(Fold):
-        s1 = 'tempA=Training_Fold%d'% (i + 1)
-        exec (s1)
+        s1 = 'tempA=Training_Fold%d' % (i + 1)
+        exec(s1)
         s2 = 'tempB=Validation_Fold%d' % (i + 1)
-        exec (s2)
+        exec(s2)
 
         sql1 = 'create table Training_Fold%d_%s(n float(10));' % (i + 1, keyword)
-        query1=str(sql1)
+        query1 = str(sql1)
         curs2.execute(query1)
         sql2 = 'create table Validation_Fold%d_%s(n float(10));' % (i + 1, keyword)
         query2 = str(sql2)
         curs2.execute(query2)
 
         for j in tempA:
-            sql3 = 'insert into Training_Fold%d_%s (n) values (%s)'% (i + 1, keyword,str(j[0]))
-            query3=str(sql3)
+            sql3 = 'insert into Training_Fold%d_%s (n) values (%s)' % (i + 1, keyword, str(j[0]))
+            query3 = str(sql3)
             curs2.execute(query3)
 
         for j in tempB:
-            sql4 = 'insert into Validation_Fold%d_%s (n) values (%s)' % (i + 1, keyword,str(j[0]))
-            query4=str(sql4)
+            sql4 = 'insert into Validation_Fold%d_%s (n) values (%s)' % (i + 1, keyword, str(j[0]))
+            query4 = str(sql4)
             curs2.execute(query4)
 
-    ###########  k-fold 
     NoOfData = int(raw_data.shape[0])
     Fold = 4
     NoOfFold_Data = int(NoOfData / Fold)
@@ -195,87 +191,44 @@ for keyword in keyword:
         s = 'TrainingFold_Label%d = temp_Train_Final' % (i + 1)
         exec(s)
 
-    # Validation Data set
-    for i in range(Fold):
-        temp_label_forANN = All_Label_forANN.iloc[FoldDataNo * i:FoldDataNo * (i + 1), :]
-        temp_Label_Final_forANN = pd.DataFrame(temp_label_forANN)
-
-        s = 'ValidationFold_Label%d_forANN = temp_Label_Final_forANN' % (i + 1)
-        exec(s)
-
-    # Training Data set
-    for i in range(Fold):
-        temp_Train_Front_forANN = All_Label_forANN.iloc[:FoldDataNo * i, :]
-        temp_Train_Back_forANN = All_Label_forANN.iloc[FoldDataNo * (i + 1):, :]
-        temp_Train_Total_forANN = np.concatenate([temp_Train_Front_forANN, temp_Train_Back_forANN], axis=0)
-        temp_Train_Final_forANN = pd.DataFrame(temp_Train_Total_forANN)
-
-        s = 'TrainingFold_Label%d_forANN = temp_Train_Final_forANN' % (i + 1)
-        exec(s)
-
 
     # for SVM & KNN
     for i in range(Fold):
         s1 = 'tempA=TrainingFold_Label%d' % (i + 1)
-        exec (s1)
+        exec(s1)
         s2 = 'tempB=ValidationFold_Label%d' % (i + 1)
-        exec (s2)
+        exec(s2)
 
         sql1 = 'create table TrainingFold_Label%d_%s(n float(10));' % (i + 1, keyword)
-        query1=str(sql1)
+        query1 = str(sql1)
         curs2.execute(query1)
         sql2 = 'create table ValidationFold_Label%d_%s(n float(10));' % (i + 1, keyword)
         query2 = str(sql2)
         curs2.execute(query2)
 
         for j in tempA:
-            sql3 = 'insert into TrainingFold_Label%d_%s (n) values (%s)'% (i + 1, keyword,str(j))
-            query3=str(sql3)
+            sql3 = 'insert into TrainingFold_Label%d_%s (n) values (%s)' % (i + 1, keyword, str(j))
+            query3 = str(sql3)
             curs2.execute(query3)
 
         for j in tempB:
-            sql4 = 'insert into ValidationFold_Label%d_%s (n) values (%s)' % (i + 1, keyword,str(j))
+            sql4 = 'insert into ValidationFold_Label%d_%s (n) values (%s)' % (i + 1, keyword, str(j))
             query4 = str(sql4)
             curs2.execute(query4)
 
 
-    # for ANN
-    for i in range(Fold):
-        s1 = 'tempA=np.array(TrainingFold_Label%d_forANN)' % (i + 1)
-        exec(s1)
-        s2 = 'tempB=np.array(ValidationFold_Label%d_forANN)' % (i + 1)
-        exec(s2)
-
-        sql1 = 'create table TrainingFold_Label%d_forANN_%s(n1 float(10),n2 float(10));' % (i + 1, keyword)
-        query1 = str(sql1)
-        curs2.execute(query1)
-        sql2 = 'create table ValidationFold_Label%d_forANN_%s(n1 float(10),n2 float(10));' % (i + 1, keyword)
-        query2 = str(sql2)
-        curs2.execute(query2)
-
-        for j in tempA:
-            sql3 = 'insert into TrainingFold_Label%d_forANN_%s (n1,n2) values (%s,%s)' % (i + 1, keyword,str(j[0]),str(j[1]))
-            query3=str(sql3)
-            curs2.execute(query3)
-
-        for j in tempB:
-            sql4 = 'insert into ValidationFold_Label%d_forANN_%s (n1,n2) values (%s,%s)' % (i + 1, keyword,str(j[0]),str(j[1]))
-            query4=str(sql4)
-            curs2.execute(query4)
-
     temp_Train = np.concatenate((date_array, date_array), axis=0)
     temp_Train_Final = np.concatenate((temp_Train, temp_Train), axis=0)
 
-
     Training_All = np.array(temp_Train_Final)
     Training_All_Label1 = np.array(All_Label)
-    Training_All_Label=np.array([[0]],dtype=float)
+    Training_All_Label = np.array([[0]], dtype=float)
     for i in Training_All_Label1:
-        a=np.array([[i]])
-        Training_All_Label=np.concatenate((Training_All_Label,a),axis=0)
+        a = np.array([[i]])
+        Training_All_Label = np.concatenate((Training_All_Label, a), axis=0)
 
     Training_All_Label = np.delete(Training_All_Label, 0, 0)
-    Training_All_Label_forANN = np.array(All_Label_forANN)
+
 
     sql1 = 'create table Training_All_%s(n float(10))' % (keyword)
     query1 = str(sql1)
@@ -285,27 +238,19 @@ for keyword in keyword:
     query2 = str(sql2)
     curs2.execute(query2)
 
-    sql3 = 'create table Training_All_Label_forANN_%s(n1 float(10),n2 float(10))' % (keyword)
-    query3 = str(sql3)
-    curs2.execute(query3)
-    
-    
+
     for i in Training_All:
-        sql1='insert into Training_All_%s (n) values (%s)' % (keyword,str(i[0]))
-        query1=str(sql1)
+        sql1 = 'insert into Training_All_%s (n) values (%s)' % (keyword, str(i[0]))
+        query1 = str(sql1)
         curs2.execute(query1)
 
     for i in Training_All_Label:
-        sql1='insert into Training_All_Label_%s (n) values (%s)'% (keyword,str(i[0]))
+        sql1 = 'insert into Training_All_Label_%s (n) values (%s)' % (keyword, str(i[0]))
         query1 = str(sql1)
         curs2.execute(query1)
 
-    for i in Training_All_Label_forANN:
-        sql1='insert into Training_All_Label_forANN_%s (n1,n2) values (%s,%s)'% (keyword,str(i[0]),str(i[1]))
-        query1 = str(sql1)
-        curs2.execute(query1)
 
-        
+    #############################################################################################
     Fold = 4
 
     date_array = np.array([[0]], dtype=int)
@@ -318,9 +263,9 @@ for keyword in keyword:
 
     # k-fold 학습/검증 데이터
     for i in range(Fold):
-        query1='select * from Training_Fold%d_%s'% (i + 1, keyword)
+        query1 = 'select * from Training_Fold%d_%s' % (i + 1, keyword)
         curs2.execute(query1)
-        array1=curs2.fetchall()
+        array1 = curs2.fetchall()
         c1 = 'Training_Fold%d   = np.array(array1)' % (i + 1)
         exec(c1)
 
@@ -344,36 +289,20 @@ for keyword in keyword:
         c2 = 'ValidationFold_Label%d = np.array(array2)' % (i + 1)
         exec(c2)
 
-        query3 = 'select * from TrainingFold_Label%d_forANN_%s' % (i + 1, keyword)
-        curs2.execute(query3)
-        array3 = curs2.fetchall()
-        c3 = 'TrainingFold_Label%d_forANN = np.array(array3)' % (i + 1)
-        exec(c3)
-
-        query4 = 'select * from ValidationFold_Label%d_forANN_%s' % (i + 1, keyword)
-        curs2.execute(query4)
-        array4 = curs2.fetchall()
-        c4 = 'ValidationFold_Label%d_forANN = np.array(array4)' % (i + 1)
-        exec(c4)
 
     # 전체 학습용 데이터
     query1 = 'select * from Training_All_%s' % (keyword)
     curs2.execute(query1)
-    array1=curs2.fetchall()
-    c1='Training_All = np.array(array1)'
+    array1 = curs2.fetchall()
+    c1 = 'Training_All = np.array(array1)'
     exec(c1)
 
-    query2='select * from Training_All_Label_%s' % (keyword)
+    query2 = 'select * from Training_All_Label_%s' % (keyword)
     curs2.execute(query2)
     array2 = curs2.fetchall()
     c2 = 'Training_All_Label = np.array(array2)'
     exec(c2)
 
-    query3 = 'select * from Training_All_Label_forANN_%s' % (keyword)
-    curs2.execute(query3)
-    array3 = curs2.fetchall()
-    c3 = 'Training_All_Label_forANN = np.array(array3)'
-    exec(c3)
 
     ############   KNN
 
@@ -445,8 +374,6 @@ for keyword in keyword:
     value2 = keyword
     sql2 = "insert into MLpredict_list_female (word) values (%s)"
     curs1.execute(sql2, value2)
-
-
 
 conn1.commit()
 conn1.close()
