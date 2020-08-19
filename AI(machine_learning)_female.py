@@ -34,7 +34,11 @@ curs1.execute(query1)
 keyword_female_array1 = curs1.fetchall()
 
 keyword_female1 = []
+k=0
 for i in keyword_female_array1:
+    k = k + 1
+    if k ==10:     ##### 상위 10개에 대해서만 특징추출 및 머신러닝
+        break
     keyword_female1.append(i[1])
 
 query2 = "select * from MLpredict_list_female"
