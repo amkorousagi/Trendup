@@ -31,7 +31,7 @@ curs1 = conn1.cursor()
 curs2 = conn2.cursor()
 
 def ml_female(lst):
-    query1 = "select * from keyword_live_male"
+    query1 = "select * from keyword_live_female"
     curs1.execute(query1)
     keyword_female_array1 = curs1.fetchall()
 
