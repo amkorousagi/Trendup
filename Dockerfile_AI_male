@@ -14,8 +14,7 @@ RUN apt-get update -y\
 RUN pip3 install pandas\
         &&pip3 install numpy\
         &&pip3 install pymysql\
-        &&pip3 install sklearn\
-        &&pip3 install time
+        &&pip3 install sklearn
         
 RUN git clone https://github.com/amkorousagi/Trendup.git
 
