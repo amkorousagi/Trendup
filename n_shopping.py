@@ -58,7 +58,7 @@ def n_shopping(lst):
             k = k + 1
     return 0
             
-staff_socket = tcp.staff_ready(5003)
+staff_socket = tcp.staff_ready(5004)
 tcp.staff_update(n_shopping, [], staff_socket)
             
 conn.commit()

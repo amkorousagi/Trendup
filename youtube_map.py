@@ -271,7 +271,7 @@ def do_map(no):
     return 0
 
 if __name__ == '__main__':
-    staff_socket = tcp.staff_ready(5004)
+    staff_socket = tcp.staff_ready(5003)
     tcp.staff_update(do_map, "여자 여름옷", staff_socket)
     conn.commit()
     conn.close()

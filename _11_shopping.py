@@ -2,6 +2,7 @@
 
 import requests
 import pymysql.cursors
+import tcp
 
 from bs4 import BeautifulSoup
 
@@ -38,7 +39,7 @@ conn = pymysql.connect(
     )
 curs=conn.cursor()
 
-def _11_shopping():
+def _11_shopping(lst):
     for i in gender:
 
         url = "http://www.11st.co.kr/browsing/BestSeller.tmall?method=getBestSellerMain&cornerNo=2&dispCtgrNo="+switch_site(i)
@@ -101,7 +102,10 @@ def _11_shopping():
             curs.execute(query1,values1)
 
             k=k+1
+    return 0
 
+staff_socket = tcp.staff_ready(5006)
+tcp.staff_update(_11_shopping, [], staff_socket)
 
 conn.commit()
 conn.close()

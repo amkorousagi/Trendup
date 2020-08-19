@@ -2,6 +2,7 @@
 
 import requests
 import pymysql.cursors
+import tcp
 
 from bs4 import BeautifulSoup
 
@@ -38,7 +39,7 @@ conn = pymysql.connect(
     )
 curs=conn.cursor()
 
-def c_shopping():
+def c_shopping(lst):
     for i in gender:
 
         url ="https://www.coupang.com/np/categories/"+switch_site(i)
@@ -94,7 +95,12 @@ def c_shopping():
             query1="insert into c_shopping (rank,keyword,date_,gender,score) values(%s,%s,cast(now() as char),%s,%s)"
             curs.execute(query1,values1)
             k=k+1
+    return 0
 
+
+
+staff_socket = tcp.staff_ready(5005)
+tcp.staff_update(c_shopping, [], staff_socket)
 
 conn.commit()
 conn.close()
