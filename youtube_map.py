@@ -266,7 +266,7 @@ def make_map(result_dict):
 def do_map(no):
     curs.execute(QUERY_SELECT_ALL_YOUTUBE_VIDEO_ID)
     rows = curs.fetchall()
-    result_dict = analyze_channel_map(rows[0]['id'])
+    result_dict = analyze_channel_map(rows[0][0])
     make_map(result_dict)
     return 0
 
