@@ -29,7 +29,8 @@ for i in MLpredict_list:
         for j in accuracy:
                 KNN=KNN+j[0]
                 SVM=SVM+j[1]
-
+        
+        ############### SVM 과 KNN 알고리즘 정확도 비교 및 높은 값 선택
         x=0
         if KNN>SVM:
                 x=0
@@ -46,7 +47,8 @@ for i in MLpredict_list:
 
         date=month*30+day
         order=round(date/2.34)
-
+        
+        ######### 최종 database 테이블에 저장
         if predict[order][x]==1:
                 if x==0:
                         value4 = (keyword,KNN/4)
