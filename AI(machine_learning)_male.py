@@ -114,10 +114,14 @@ def ml_male(lst):
             k = k + 1
 
 
-        All_Label[NoOfFold_Data-1] = 1
-        All_Label[NoOfFold_Data*2-1] = 1
-        All_Label[NoOfFold_Data*3-1] = 1
-        All_Label[NoOfFold_Data*4-1] = 1
+        All_Label[0] = 0
+        All_Label[NoOfFold_Data - 1] = 1
+        All_Label[NoOfFold_Data] = 0
+        All_Label[NoOfFold_Data * 2 - 1] = 1
+        All_Label[NoOfFold_Data * 2] = 0
+        All_Label[NoOfFold_Data * 3 - 1] = 1
+        All_Label[NoOfFold_Data * 3] = 0
+        All_Label[NoOfFold_Data * 4 - 1] = 1
 
         All_Label = pd.Series(All_Label)
 
